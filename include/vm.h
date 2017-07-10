@@ -11,14 +11,16 @@ typedef struct st_vm_state{
 	int sp;
 	int bp;
 	unsigned char flags[VM_FLAG_COUNT]; // Z H L
-	char *memory;
+	unsigned char *memory;
 
-	int text_start;
+	int data_size;
 	int entrypoint;
+	int total_size;
 }vm_state;
 
 vm_state *vm_new();
-vm_load_file(char *path);
+int vm_load_file(vm_state *st,char *path);
+int vm_execute();
 
 
 #endif
