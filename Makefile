@@ -1,4 +1,4 @@
-CFLAGS=-Wall
+CFLAGS=-Wall --std=c99
 INCLUDES= -I include
 
 SOURCES=$(wildcard src/*.c)

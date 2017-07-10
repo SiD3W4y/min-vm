@@ -1,6 +1,8 @@
 #ifndef VM_H
 #define VM_H
 
+#include "ops.h"
+
 #define VM_MEMORY 1024*42 // 42Ko
 #define VM_REG_COUNT 6
 #define VM_FLAG_COUNT 3
@@ -20,7 +22,8 @@ typedef struct st_vm_state{
 
 vm_state *vm_new();
 int vm_load_file(vm_state *st,char *path);
-int vm_execute();
+int vm_execute(vm_state *st);
+vm_opcode vm_get_op(vm_state *st);
 
 
 #endif

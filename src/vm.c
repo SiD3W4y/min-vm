@@ -1,8 +1,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 
 #include "vm.h"
+#include "ops.h"
+
+
+#define VM_GET_BYTE(vm) vm->memory[vm->ip++]
 
 static int bytes_to_int(unsigned char *buff)
 {
@@ -17,6 +22,23 @@ static int bytes_to_int(unsigned char *buff)
 	result |= buff[0];
 
 	return result;
+}
+
+static short bytes_to_short(unsigned char *buff)
+{
+	short result = 0;
+
+	result |= buff[1];
+	result = result << 8;
+	result |= buff[0];
+
+	return result;
+}
+
+static void parse_cond(vm_opcode *op,unsigned char data)
+{
+	op->first_reg = data & 0x01;
+	op->second_reg = (data >> 1) & 0x01;
 }
 
 int vm_load_file(vm_state *st,char *path)
@@ -46,6 +68,7 @@ int vm_load_file(vm_state *st,char *path)
 	st->data_size = bytes_to_int(&st->memory[6]);
 
 	printf("[+] Data size : 0x%x Entrypoint : 0x%x\n",st->data_size,st->entrypoint);
+	st->ip = st->entrypoint;
 
 	return 0;
 }
@@ -75,9 +98,36 @@ vm_state *vm_new()
 	return st;
 }
 
-int vm_execute()
+vm_opcode vm_get_op(vm_state *st)
 {
+	vm_opcode opc;
 
+	opc.op = VM_GET_BYTE(st); // Get opcode
+	parse_cond(&opc,VM_GET_BYTE(st)); // Parse them and put the result in opcode struct
+
+	if(opc.first_reg == true){
+		opc.first_value = bytes_to_short(&st->memory[st->ip]);
+		st->ip += 2;
+	}else{
+		opc.first_value = bytes_to_int(&st->memory[st->ip]);
+		st->ip += 4;
+	}
+
+	if(opc.second_reg == true){
+		opc.second_value = bytes_to_short(&st->memory[st->ip]);
+		st->ip += 2;
+	}else{
+		opc.second_value = bytes_to_int(&st->memory[st->ip]);
+		st->ip += 4;
+	}
+
+	return opc;
+}
+
+int vm_execute(vm_state *st)
+{
+	vm_opcode op = vm_get_op(st);
+	return 0;
 }
 
 

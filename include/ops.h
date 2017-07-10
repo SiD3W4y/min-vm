@@ -12,4 +12,16 @@
 #define OP_CMP = 0x08
 #define OP_JMP = 0x09
 
+#include <stdbool.h>
+
+typedef struct vm_opcode{
+	int op;
+	bool first_reg;
+	bool second_reg;
+	int first_value;
+	int second_value;
+}vm_opcode;
+
+char *OPS_STR[] = {"SYS","ADD","SUB","MUL","MOV","LDR","PUSH","POP","CMP","JMP"};
+
 #endif
