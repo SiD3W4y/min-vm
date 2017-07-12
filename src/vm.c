@@ -1,10 +1,13 @@
 #include <stdlib.h>
+#include <unistd.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
 
 #include "vm.h"
 #include "ops.h"
+#include "disas.h"
+#include "syscall.h"
 
 
 #define VM_GET_BYTE(vm) vm->memory[vm->ip++]
@@ -41,6 +44,14 @@ static void parse_cond(vm_opcode *op,unsigned char data)
 	op->second_reg = (data >> 1) & 0x01;
 }
 
+static void vm_print_regs(vm_state *st)
+{
+	int i;
+	for(i=0;i < VM_REG_COUNT;i++){
+		printf("%d : 0x%08x\n",i,st->regs[i]);
+	}
+}
+
 int vm_load_file(vm_state *st,char *path)
 {
 	FILE *fp;
@@ -65,9 +76,9 @@ int vm_load_file(vm_state *st,char *path)
 	}
 
 	st->entrypoint = bytes_to_int(&st->memory[2]);
-	st->data_size = bytes_to_int(&st->memory[6]);
+	st->binary_size = bytes_to_int(&st->memory[6]);
 
-	printf("[+] Data size : 0x%x Entrypoint : 0x%x\n",st->data_size,st->entrypoint);
+	//printf("[+] Data size : 0x%x Entrypoint : 0x%x\n",st->binary_size,st->entrypoint);
 	st->ip = st->entrypoint;
 
 	return 0;
@@ -124,9 +135,63 @@ vm_opcode vm_get_op(vm_state *st)
 	return opc;
 }
 
+int vm_syscall(vm_state *st,int syscall)
+{
+	switch(syscall){
+		case SYS_WRITE:
+//			printf("write(fd -> %d, addr -> 0x%08x, size -> %d)\n",st->regs[1],st->regs[2],st->regs[3]);
+			write(st->regs[1],&st->memory[st->regs[2]],st->regs[3]);
+			break;
+		case SYS_EXIT:
+//			printf("exit(code -> %d)\n",st->regs[2]);
+			exit(st->regs[2]);
+	}
+
+	return 0;
+}
+
 int vm_execute(vm_state *st)
 {
-	vm_opcode op = vm_get_op(st);
+	while(st->ip < st->binary_size){	
+		vm_opcode op = vm_get_op(st);
+
+
+		switch(op.op){
+			case OP_MOV:
+				if(op.first_reg == true && op.second_reg == false){
+					st->regs[op.first_value] = op.second_value;
+				}else{
+					printf("MOV : Error wrong argument combination\n");
+					return -1;
+				}
+				break;
+			case OP_LDR:
+				if(op.first_reg == true){
+					if(op.second_reg == true){
+						memcpy(&st->regs[op.first_value],&st->memory[st->regs[op.second_value]],4);
+					}else{
+						memcpy(&st->regs[op.first_value],&st->memory[op.second_value],4);
+					}
+				}else{
+					printf("LDR : First agument not a register\n");
+					return -1;
+				}
+				break;
+			case OP_SYS:
+				vm_syscall(st,st->regs[0]);
+				break;
+			case OP_JMP:
+				if(op.first_reg == false){
+					//printf("Jump to 0x%08x\n",st->ip);
+					st->ip = op.first_value;
+				}else{
+					printf("JMP : First argument must be a value\n");
+					return -1;
+				}
+				break;
+		}
+	}
+
 	return 0;
 }
 
