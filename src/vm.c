@@ -168,10 +168,14 @@ int vm_execute(vm_state *st)
 
 		switch(op.op){
 			case OP_MOV:
-				if(op.first_reg == true && op.second_reg == false){
-					st->regs[op.first_value] = op.second_value;
+				if(op.first_reg == true){
+					if(op.second_reg == true){
+						st->regs[op.first_value] = st->regs[op.second_value];
+					}else{
+						st->regs[op.first_value] = op.second_value;
+					}
 				}else{
-					printf("MOV : Error wrong argument combination\n");
+					log_error("MOV : Error wrong argument combination\n");
 					return -1;
 				}
 				break;
@@ -183,7 +187,7 @@ int vm_execute(vm_state *st)
 						memcpy(&st->regs[op.first_value],&st->memory[op.second_value],4);
 					}
 				}else{
-					printf("LDR : First agument not a register\n");
+					log_error("LDR : First agument not a register\n");
 					return -1;
 				}
 				break;
@@ -195,7 +199,45 @@ int vm_execute(vm_state *st)
 					//printf("Jump to 0x%08x\n",st->ip);
 					st->ip = op.first_value;
 				}else{
-					printf("JMP : First argument must be a value\n");
+					log_error("JMP : First argument must be a value\n");
+					return -1;
+				}
+				break;
+			case OP_ADD:
+				if(op.first_reg == true){
+					if(op.second_reg == true){
+						st->regs[op.first_value] += st->regs[op.second_value];
+					}else{
+						st->regs[op.first_value] += op.second_value;
+					}
+				}else{
+					log_error("ADD first argument must be a register !\n");
+					return -1;
+				}
+				break;
+
+			case OP_SUB:
+				if(op.first_reg == true){
+					if(op.second_reg == true){
+						st->regs[op.first_value] -= st->regs[op.second_value];
+					}else{
+						st->regs[op.first_value] -= op.second_value;
+					}
+				}else{
+					log_error("SUB first argument must be a register !\n");
+					return -1;
+				}
+				break;
+
+			case OP_MUL:
+				if(op.first_reg == true){
+					if(op.second_reg == true){
+						st->regs[op.first_value] *= st->regs[op.second_value];
+					}else{
+						st->regs[op.first_value] *= op.second_value;
+					}
+				}else{
+					log_error("MUL first argument must be a register !\n");
 					return -1;
 				}
 				break;
