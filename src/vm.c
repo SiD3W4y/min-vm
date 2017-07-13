@@ -212,7 +212,7 @@ int vm_execute(vm_state *st)
 				break;
 			case OP_JNE:
 				if(op.first_reg == false){
-					if(st->regs[0] == 0){
+					if(st->flags[0] == 0){
 						st->ip = op.first_value;
 					}
 
@@ -226,7 +226,7 @@ int vm_execute(vm_state *st)
 				break;
 			case OP_JE:
 				if(op.first_reg == false){
-					if(st->regs[0] == 1){
+					if(st->flags[0] == 1){
 						st->ip = op.first_value;
 					}
 
@@ -240,7 +240,7 @@ int vm_execute(vm_state *st)
 				break;
 			case OP_JLE:
 				if(op.first_reg == false){
-					if(st->regs[2] == 1){
+					if(st->flags[2] == 1){
 						st->ip = op.first_value;
 					}
 
@@ -254,7 +254,7 @@ int vm_execute(vm_state *st)
 				break;
 			case OP_JBE:
 				if(op.first_reg == false){
-					if(st->regs[1] == 1){
+					if(st->flags[1] == 1){
 						st->ip = op.first_value;
 					}
 
