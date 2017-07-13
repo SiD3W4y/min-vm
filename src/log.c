@@ -37,3 +37,10 @@ void log_syscall(char *fmt,...)
 	va_start(args,fmt);
 	log_raw("SYSCALL","\x1b[36m",fmt,args);
 }
+
+void log_tracing(char *fmt,...)
+{
+	va_list args;
+	va_start(args,fmt);
+	log_raw("TRACING","\x1b[94m",fmt,args);
+}

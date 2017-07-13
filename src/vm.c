@@ -81,7 +81,7 @@ int vm_load_file(vm_state *st,char *path)
 
 	st->ip = st->entrypoint;
 
-	if(st->debug == 1){
+	if(st->debug > 0){
 		log_info("Binary entry point : 0x%08x\n",st->entrypoint);
 	}
 
@@ -145,13 +145,13 @@ int vm_syscall(vm_state *st,int syscall)
 {
 	switch(syscall){
 		case SYS_WRITE:
-			if(st->debug == 1){
+			if(st->debug > 0){
 				log_syscall("write(fd -> %d, addr -> 0x%08x, size -> %d)\n",st->regs[1],st->regs[2],st->regs[3]);
 			}
 			write(st->regs[1],&st->memory[st->regs[2]],st->regs[3]);
 			break;
 		case SYS_EXIT:
-			if(st->debug == 1){
+			if(st->debug > 0){
 			log_syscall("exit(code -> %d)\n",st->regs[1]);
 			}
 			exit(st->regs[2]);
@@ -164,6 +164,10 @@ int vm_execute(vm_state *st)
 {
 	while(st->ip < st->binary_size){	
 		vm_opcode op = vm_get_op(st);
+
+		if(st->debug == 2){
+			log_tracing("0x%08x : %s %d %d\n",st->ip,OP_NAMES[op.op],op.first_value,op.second_value);
+		}
 
 
 		switch(op.op){
@@ -198,14 +202,75 @@ int vm_execute(vm_state *st)
 				if(op.first_reg == false){
 					st->ip = op.first_value;
 
-					if(st->debug == 1){
-						log_info("Jump to 0x%08x\n",st->ip);
+					if(st->debug > 0){
+						log_info("jmp 0x%08x\n",st->ip);
 					}
 				}else{
 					log_error("JMP : First argument must be a value\n");
 					return -1;
 				}
 				break;
+			case OP_JNE:
+				if(op.first_reg == false){
+					if(st->regs[0] == 0){
+						st->ip = op.first_value;
+					}
+
+					if(st->debug > 0){
+						log_info("jne 0x%08x\n",st->ip);
+					}
+
+				}else{
+					log_error("JNE first argument must be a value\n");
+				}
+				break;
+			case OP_JE:
+				if(op.first_reg == false){
+					if(st->regs[0] == 1){
+						st->ip = op.first_value;
+					}
+
+					if(st->debug > 0){
+						log_info("je 0x%08x\n",st->ip);
+					}
+
+				}else{
+					log_error("JE first argument must be a value\n");
+				}
+				break;
+			case OP_JLE:
+				if(op.first_reg == false){
+					if(st->regs[2] == 1){
+						st->ip = op.first_value;
+					}
+
+					if(st->debug > 0){
+						log_info("jle 0x%08x\n",st->ip);
+					}
+
+				}else{
+					log_error("JLE first argument must be a value\n");
+				}
+				break;
+			case OP_JBE:
+				if(op.first_reg == false){
+					if(st->regs[1] == 1){
+						st->ip = op.first_value;
+					}
+
+					if(st->debug > 0){
+						log_info("jbe 0x%08x\n",st->ip);
+					}
+
+				}else{
+					log_error("JBE first argument must be a value\n");
+				}
+				break;
+
+
+
+
+
 			case OP_ADD:
 				if(op.first_reg == true){
 					if(op.second_reg == true){
@@ -308,6 +373,45 @@ int vm_execute(vm_state *st)
 				}else{
 					log_error("SHL first argument must be a register !\n");
 					return -1;
+				}
+				break;
+			case OP_CMP:
+				if(op.first_reg == true){
+					// st->flags[0] is Z flag : ==
+					// st->flags[1] is H flag : >
+					// st->flags[2] is L flag : <
+					int lhs = st->regs[op.first_value];
+					int rhs = op.second_value;
+
+					if(op.second_reg == true){
+						rhs = st->regs[rhs];
+					}	
+					
+					
+
+					if(lhs == rhs){
+						st->flags[0] = 1;
+					}else{
+						st->flags[0] = 0;
+					}
+
+					if(lhs > rhs){
+						st->flags[1] = 1;
+					}else{
+						st->flags[1] = 0;
+					}
+
+					if(lhs < rhs){
+						st->flags[2] = 1;
+					}else{
+						st->flags[2] = 0;
+					}
+
+					if(st->debug > 0){
+						log_info("0x%08x : CMP %d %d [Z = %d,H = %d,L = %d]\n",st->ip,lhs,rhs,st->flags[0],st->flags[1],st->flags[2]);
+					}
+				}else{
+					log_error("CMP first argument must be a register !\n");
 				}
 				break;
 		}
