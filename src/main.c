@@ -7,7 +7,7 @@
 
 int main(int argc,char **argv)
 {
-	char *usage = "usage: min-vm [--run/--debug] <file>\n\n"
+	char *usage = "usage: min-vm [--run/--debug/--tracing] <file>\n\n"
 		"	--run     : Simply runs the specified binary\n"
 		"	--debug   : Run the program with debug output\n"
 		"	--tracing : Run the program with debug + trace\n";

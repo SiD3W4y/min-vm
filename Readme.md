@@ -5,10 +5,11 @@ This repo contains the virtual machine that runs min bytecode.It can run the byt
 ## Usage
 
 ```
-usage: min-vm [--run/--debug] <file>
+usage: min-vm [--run/--debug/--tracing] <file>
 
         --run   : Simply runs the specified binary
         --debug : Run the program with debug output
+        --tracing : Run the program with debug + trace
 ```
 
 ## Assemble a .min file
@@ -29,12 +30,12 @@ If you want for whatever reason to compile some min assembly, you can use the co
     * [ ] **strb** {r} {a}
     * [ ] **push** {r} 
     * [ ] **pop** {r}
-    * [ ] **cmp** {r} {r,n}
+    * [x] **cmp** {r} {r,n}
     * [x] **jmp** {a}
-    * [ ] **jne** {a}
-    * [ ] **je** {a}
-    * [ ] **jle** {a}
-    * [ ] **jbe** {a}
+    * [x] **jne** {a}
+    * [x] **je** {a}
+    * [x] **jle** {a}
+    * [x] **jbe** {a}
     * [x] **sys**
     * [x] **xor** {r} {r,n}
     * [x] **and** {r} {r,n}
