@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "vm.h"
+#include "log.h"
 
 int main(int argc,char **argv)
 {
@@ -20,9 +21,11 @@ int main(int argc,char **argv)
 	mode = argv[1];
 
 	if(strcmp(mode,"--run") == 0 || strcmp(mode,"--debug") == 0){
-		if(strcmp(mode,"--debug")){
+		if(strcmp(mode,"--debug") == 0){
 			vm->debug = 1;
+			log_info("Debug mode enabled\n");
 		}
+
 
 		vm_load_file(vm,argv[2]);
 		vm_execute(vm);
