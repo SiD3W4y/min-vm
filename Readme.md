@@ -23,7 +23,7 @@ If you want for whatever reason to compile some min assembly, you can use the co
     * [x] **add** {r} {r,n} 
     * [x] **sub** {r} {r,n} 
     * [x] **mul** {r} {r,n}
-    * [x] **mov** {r} {r,n}
+    * [x] **mov** {r} {r,n,a}
     * [x] **ldr** {r} {a}
     * [ ] **ldrb** {r} {a}
     * [ ] **str** {r} {a}
