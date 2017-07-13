@@ -36,10 +36,10 @@ If you want for whatever reason to compile some min assembly, you can use the co
     * [ ] **jle** {a}
     * [ ] **jbe** {a}
     * [x] **sys**
-    * [ ] **xor** {r} {r,n}
-    * [ ] **and** {r} {r,n}
-    * [ ] **or** {r} {r,n}
-    * [ ] **shr** {r} {r,n}
-    * [ ] **shl** {r} {r,n}
+    * [x] **xor** {r} {r,n}
+    * [x] **and** {r} {r,n}
+    * [x] **or** {r} {r,n}
+    * [x] **shr** {r} {r,n}
+    * [x] **shl** {r} {r,n}
 
 
