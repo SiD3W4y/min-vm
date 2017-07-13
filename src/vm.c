@@ -8,7 +8,7 @@
 #include "ops.h"
 #include "disas.h"
 #include "syscall.h"
-
+#include "log.h"
 
 #define VM_GET_BYTE(vm) vm->memory[vm->ip++]
 
@@ -44,11 +44,12 @@ static void parse_cond(vm_opcode *op,unsigned char data)
 	op->second_reg = (data >> 1) & 0x01;
 }
 
-static void vm_print_regs(vm_state *st)
+static void vm_print_regs(vm_state *st) // Debug function ?
 {
+	log_info("Register state\n");
 	int i;
 	for(i=0;i < VM_REG_COUNT;i++){
-		printf("%d : 0x%08x\n",i,st->regs[i]);
+		log_info("%s : 0x%08x\n",OP_REGS[i],st->regs[i]);
 	}
 }
 
@@ -78,8 +79,11 @@ int vm_load_file(vm_state *st,char *path)
 	st->entrypoint = bytes_to_int(&st->memory[2]);
 	st->binary_size = bytes_to_int(&st->memory[6]);
 
-	//printf("[+] Data size : 0x%x Entrypoint : 0x%x\n",st->binary_size,st->entrypoint);
 	st->ip = st->entrypoint;
+
+	if(st->debug == 1){
+		log_info("Binary entry point : 0x%08x\n",st->entrypoint);
+	}
 
 	return 0;
 }
@@ -141,11 +145,15 @@ int vm_syscall(vm_state *st,int syscall)
 {
 	switch(syscall){
 		case SYS_WRITE:
-//			printf("write(fd -> %d, addr -> 0x%08x, size -> %d)\n",st->regs[1],st->regs[2],st->regs[3]);
+			if(st->debug == 1){
+				log_syscall("write(fd -> %d, addr -> 0x%08x, size -> %d)\n",st->regs[1],st->regs[2],st->regs[3]);
+			}
 			write(st->regs[1],&st->memory[st->regs[2]],st->regs[3]);
 			break;
 		case SYS_EXIT:
-//			printf("exit(code -> %d)\n",st->regs[2]);
+			if(st->debug == 1){
+			log_syscall("exit(code -> %d)\n",st->regs[1]);
+			}
 			exit(st->regs[2]);
 	}
 
