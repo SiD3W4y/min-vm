@@ -100,9 +100,9 @@ vm_state *vm_new()
 	}
 	
 	st->ip = 0;
-	st->sp = VM_MEMORY;
-	st->bp = 0;
-
+	st->regs[VM_REG_COUNT-1] = VM_MEMORY; // SP
+	st->regs[VM_REG_COUNT-2] = 0; // BP
+	
 	st->memory = malloc(VM_MEMORY);
 	memset(st->memory,0,VM_MEMORY);
 
