@@ -196,7 +196,9 @@ int vm_execute(vm_state *st)
 				break;
 			case OP_JMP:
 				if(op.first_reg == false){
-					//printf("Jump to 0x%08x\n",st->ip);
+					if(st->debug == 1){
+						log_info("Jump to 0x%08x\n",st->ip);
+					}
 					st->ip = op.first_value;
 				}else{
 					log_error("JMP : First argument must be a value\n");
