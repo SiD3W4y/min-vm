@@ -244,6 +244,72 @@ int vm_execute(vm_state *st)
 					return -1;
 				}
 				break;
+
+			case OP_XOR:
+				if(op.first_reg == true){
+					if(op.second_reg == true){
+						st->regs[op.first_value] ^= st->regs[op.second_value];
+					}else{
+						st->regs[op.first_value] ^= op.second_value;
+					}
+
+				}else{
+					log_error("XOR first argument must be a register !\n");
+					return -1;
+				}
+				break;
+			case OP_OR:
+			if(op.first_reg == true){
+				if(op.second_reg == true){
+					st->regs[op.first_value] |= st->regs[op.second_value];
+				}else{
+					st->regs[op.first_value] |= op.second_value;
+				}
+
+			}else{
+				log_error("OR first argument must be a register !\n");
+				return -1;
+			}
+			break;
+			case OP_AND:
+				if(op.first_reg == true){
+					if(op.second_reg == true){
+						st->regs[op.first_value] &= st->regs[op.second_value];
+					}else{
+						st->regs[op.first_value] &= op.second_value;
+					}
+
+				}else{
+					log_error("AND first argument must be a register !\n");
+					return -1;
+				}
+				break;
+			case OP_SHR:
+				if(op.first_reg == true){
+					if(op.second_reg == true){
+						st->regs[op.first_value] >>= st->regs[op.second_value];
+					}else{
+						st->regs[op.first_value] >>= op.second_value;
+					}
+
+				}else{
+					log_error("SHR first argument must be a register !\n");
+					return -1;
+				}
+				break;
+			case OP_SHL:
+				if(op.first_reg == true){
+					if(op.second_reg == true){
+						st->regs[op.first_value] <<= st->regs[op.second_value];
+					}else{
+						st->regs[op.first_value] <<= op.second_value;
+					}
+
+				}else{
+					log_error("SHL first argument must be a register !\n");
+					return -1;
+				}
+				break;
 		}
 	}
 
