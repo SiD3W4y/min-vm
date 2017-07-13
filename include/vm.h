@@ -16,6 +16,7 @@ typedef struct st_vm_state{
 	int binary_size;
 	int entrypoint;
 	int total_size;
+	int debug; // Flag indicating if we are running in debug mode (1) or not (0)
 }vm_state;
 
 vm_state *vm_new();

@@ -99,6 +99,8 @@ vm_state *vm_new()
 		st->flags[i] = 0;
 	}
 	
+	st->debug = 0;
+	
 	st->ip = 0;
 	st->regs[VM_REG_COUNT-1] = VM_MEMORY; // SP
 	st->regs[VM_REG_COUNT-2] = 0; // BP
