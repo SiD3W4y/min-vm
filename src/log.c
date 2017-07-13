@@ -29,3 +29,11 @@ void log_error(char *fmt,...)
 	va_start(args,fmt);
 	log_raw("ERROR","\x1b[31m",fmt,args);
 }
+
+
+void log_syscall(char *fmt,...)
+{
+	va_list args;
+	va_start(args,fmt);
+	log_raw("SYSCALL","\x1b[36m",fmt,args);
+}
