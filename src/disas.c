@@ -4,8 +4,7 @@
 #include "disas.h"
 #include "ops.h"
 
-
-const char *OP_NAMES[] = {NULL,"SYS","ADD","SUB","MUL","MOV","LDR","PUSH","POP","CMP","JMP"};
+const char *OP_NAMES[] = {"ADD","SUB","MUL","MOV","LDR","LDRB","STR","STRB","PUSH","POP","CMP","JMP","JNE","JLE","JBE","SYS","XOR","AND","SHR","SHL"};
 const char *OP_REGS[] = {"A","B","C","D","E","F"};
 
 void ds_print_op(vm_opcode op)
