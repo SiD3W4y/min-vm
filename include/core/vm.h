@@ -1,7 +1,7 @@
 #ifndef VM_H
 #define VM_H
 
-#include "ops.h"
+#include "core/ops.h"
 
 #define VM_MEMORY 1024*42 // 42Ko
 #define VM_REG_COUNT 8

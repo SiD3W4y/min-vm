@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-#include "log.h"
+#include "utils/log.h"
 
 static void log_raw(char* title,char* color,char *fmt,va_list args)
 {

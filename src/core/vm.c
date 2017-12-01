@@ -4,11 +4,11 @@
 #include <string.h>
 #include <stdbool.h>
 
-#include "vm.h"
-#include "ops.h"
-#include "disas.h"
-#include "syscall.h"
-#include "log.h"
+#include "core/vm.h"
+#include "core/ops.h"
+#include "asm/disas.h"
+#include "core/syscall.h"
+#include "utils/log.h"
 
 #define VM_GET_BYTE(vm) vm->memory[vm->ip++]
 

@@ -1,7 +1,7 @@
 #ifndef DISAS_H
 #define DISAS_H
 
-#include "ops.h"
+#include "core/ops.h"
 
 extern const char *OP_NAMES[];
 extern const char *OP_REGS[];

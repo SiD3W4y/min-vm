@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "vm.h"
-#include "log.h"
+#include "core/vm.h"
+#include "utils/log.h"
 
 int main(int argc,char **argv)
 {
