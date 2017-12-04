@@ -6,8 +6,9 @@
 
 #include "core/vm.h"
 #include "core/ops.h"
-#include "asm/disas.h"
 #include "core/syscall.h"
+#include "core/minfile.h"
+#include "asm/disas.h"
 #include "utils/log.h"
 
 #define VM_GET_BYTE(vm) vm->memory[vm->ip++]
@@ -55,36 +56,22 @@ static void vm_print_regs(vm_state *st) // Debug function ?
 
 int vm_load_file(vm_state *st,char *path)
 {
-	FILE *fp;
-
-	fp = fopen(path,"rb");
-	
-	if(fp == NULL){
-		perror("fopen");
+	minfile *binary = minfile_new();
+	if(minfile_load(binary,path) < 0){
+		log_error("There was an error processing the file");
 		return -1;
 	}
 
-	fseek(fp,0,SEEK_END);
-	st->total_size = ftell(fp);
-
-	rewind(fp);
-	fread(st->memory,st->total_size,1,fp);
-	fclose(fp);
-
-	if(st->memory[0] != 'M' || st->memory[1] != 'X'){
-		printf("This file is not a valid min bytecode executable\n");
-		return -1;
-	}
-
-	st->entrypoint = bytes_to_int(&st->memory[2]);
-	st->binary_size = bytes_to_int(&st->memory[6]);
+	st->entrypoint = binary->entrypoint;
+	st->binary_size = binary->size;
+	st->total_size = binary->size; // This is just useless
+	st->memory = binary->image;
 
 	st->ip = st->entrypoint;
 
 	if(st->debug > 0){
 		log_info("Binary entry point : 0x%08x\n",st->entrypoint);
 	}
-
 	return 0;
 }
 
