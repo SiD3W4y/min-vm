@@ -5,26 +5,34 @@ CORE_SRC=$(wildcard src/core/*.c)
 ASM_SRC=$(wildcard src/asm/*.c)
 UTILS_SRC=$(wildcard src/utils/*.c)
 
-VM_OBJS=build/utils.o build/core.o build/asm.o build/main.o
+CORE_OBJ=$(patsubst src/core/%.c,build/core/%.o,$(CORE_SRC))
+ASM_OBJ=$(patsubst src/asm/%.c,build/asm/%.o,$(ASM_SRC))
+UTILS_OBJ=$(patsubst src/utils/%.c,build/utils/%.o,$(UTILS_SRC))
 
-SOURCES=$(wildcard src/*.c)
-OBJS=$(patsubst src/%.c,build/%.o,$(SOURCES))
+min-vm: $(ASM_OBJ) $(CORE_OBJ) $(UTILS_OBJ) build/min-vm.o
+	$(CC) $(ASM_OBJ) $(CORE_OBJ) $(UTILS_OBJ) build/min-vm.o -o min-vm
 
-build/main.o: src/main.c
-	$(CC) $(INCLUDES) $(CFLAGS) -c $< -o $@
+build/min-vm.o: src/min-vm.c
+	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
-build/core.o: $(CORE_SRC)
-	$(CC) $(INCLUDES) $(CFLAGS) -c $< -o $@
+build/core/%.o: src/core/%.c build/core
+	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
-build/asm.o: $(ASM_SRC)
-	$(CC) $(INCLUDES) $(CFLAGS) -c $< -o $@
+build/asm/%.o: src/asm/%.c build/asm
+	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
-build/utils.o: $(UTILS_SRC)
-	$(CC) $(INCLUDES) $(CFLAGS) -c $< -o $@
 
-min-vm: $(VM_OBJS)
-	$(CC) $(INCLUDES) $(CFLAGS) $(VM_OBJS) -o min-vm
+build/utils/%.o: src/utils/%.c build/utils
+	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
+
+build/core:
+	@mkdir -p build/core
+
+build/asm:
+	@mkdir -p build/asm
+
+build/utils:
+	@mkdir -p build/utils
 
 clean:
-	rm build/*
-	rm min-vm
+	rm -rf build
