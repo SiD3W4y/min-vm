@@ -24,15 +24,18 @@
 #define OP_SHR 0x14
 #define OP_SHL 0x15
 
+#define OP_MAX_INDEX 0x15
+
 
 #include <stdbool.h>
+#include <stdint.h>
 
 typedef struct vm_opcode{
-	int op;
+	uint8_t op;
 	bool first_reg;
 	bool second_reg;
-	int first_value;
-	int second_value;
+	uint32_t first_value;
+	uint32_t second_value;
 }vm_opcode;
 
 
