@@ -12,8 +12,15 @@ UTILS_OBJ=$(patsubst src/utils/%.c,build/utils/%.o,$(UTILS_SRC))
 min-vm: $(ASM_OBJ) $(CORE_OBJ) $(UTILS_OBJ) build/min-vm.o
 	$(CC) $(ASM_OBJ) $(CORE_OBJ) $(UTILS_OBJ) build/min-vm.o -o min-vm
 
+min-ds: $(ASM_OBJ) $(CORE_OBJ) $(UTILS_OBJ) build/min-ds.o
+	$(CC) $(ASM_OBJ) $(CORE_OBJ) $(UTILS_OBJ) build/min-ds.o -o min-ds
+
 build/min-vm.o: src/min-vm.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
+
+build/min-ds.o: src/min-ds.c
+	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
+
 
 build/core/%.o: src/core/%.c build/core
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
