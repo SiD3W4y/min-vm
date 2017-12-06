@@ -1,11 +1,13 @@
 #include <stdint.h>
+#include <stdio.h>
 
 #include "asm/disas.h"
 #include "core/minfile.h"
+#include "utils/list.h"
 
 int main()
 {
-	uint8_t ins[64];
+/*	uint8_t ins[64];
 	uint32_t bytes_read = 0;
 	uint32_t offset = 10;
 
@@ -21,4 +23,5 @@ int main()
 	}
 
 	return 0;
+*/
 }
