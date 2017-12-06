@@ -11,9 +11,9 @@ typedef struct console {
 	uint8_t *prompt;
 }console;
 
-console *new_console();
+console *console_new();
 void console_setprompt(console *c,uint8_t *new_prompt);
-uint8_t *console_getline(console *c); // Returns a line from stdin
+void console_getline(console *c,uint8_t *buff,uint32_t length); // Returns a line from stdin
 list *console_tokenize(console *c); // Returns a list of space separated tokens
 void console_free(console *c);
 
