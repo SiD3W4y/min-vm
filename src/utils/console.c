@@ -29,7 +29,6 @@ void console_getline(console *c,uint8_t *buff,uint32_t length)
 
 list *console_tokenize(console *c)
 {
-	// TODO : Fix that shit
 	uint8_t buff[CONSOLE_LINE_SIZE];
 	uint8_t token[CONSOLE_LINE_SIZE];
 	uint8_t *ptr = &buff;
