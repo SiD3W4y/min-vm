@@ -37,8 +37,8 @@ list *console_tokenize(console *c)
 
 	console_getline(c,buff,CONSOLE_LINE_SIZE-1);
 	
-	while(*ptr != '\x00'){
-		if(*ptr != ' '){
+	while(*ptr != '\x00' && *ptr != '\n'){
+		if(*ptr != ' ' && *ptr != '\n'){
 			token[index] = *ptr;
 			index += 1;
 			ptr++;
@@ -54,7 +54,7 @@ list *console_tokenize(console *c)
 		}
 	}
 
-	if(index > 1){
+	if(index > 0){
 		token[index] = '\x00';
 		list_append(toks,node_new(strdup(token)));
 	}
