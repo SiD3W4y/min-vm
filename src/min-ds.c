@@ -10,6 +10,10 @@
 
 static uint8_t *usage = "usage : ./min-ds <input file>\n";
 
+static uint8_t *help_cmd = "info           : Displays various file info\n"
+			"quit           : Exits the disassembler\n"
+			"s <hex offset> : Seeks to the given offset\n";
+
 static void set_prompt_offset(uint8_t *prompt,uint32_t offset)
 {
 	sprintf(prompt,"\x1b[33m[dis : 0x%08x]>\x1b[0m",offset);
@@ -37,25 +41,31 @@ int main(int argc,char **argv)
 		log_error("There was an error opening the input file -> %s\n",argv[1]);
 		return -1;
 	}
-
-	log_info("-- File info --\n");
-	log_info("Binary size : 0x%08x\n",file->size);
-	log_info("Entrypoint  : 0x%08x\n",file->entrypoint);
-
+	
 	set_prompt_offset(&prompt,file->entrypoint);
 	console_setprompt(cli,&prompt);
 	ops = console_tokenize(cli);
 
 	while(!should_quit){
-		ops = console_tokenize(cli);
 
 		if(ops->head != NULL){
 			node *cmd = ops->head;
 
-			if(strcmp(cmd->data,"print") == 0){
-				printf("WTF!!!\n");
+			if(strcmp(cmd->data,"info") == 0){
+				printf("Binary size : 0x%08x\n",file->size);
+				printf("Entrypoint  : 0x%08x\n",file->entrypoint);
+			}
+
+			if(strcmp(cmd->data,"help") == 0){
+				printf("%s",help_cmd);
+			}
+
+			if(strcmp(cmd->data,"quit") == 0){
+				return 0;
 			}
 		}
+		
+		ops = console_tokenize(cli);
 	}
 
 	return 0;
