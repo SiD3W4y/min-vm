@@ -42,6 +42,7 @@ int main(int argc,char **argv)
 		return -1;
 	}
 	
+	offset = file->entrypoint;
 	set_prompt_offset(&prompt,file->entrypoint);
 	console_setprompt(cli,&prompt);
 	ops = console_tokenize(cli);
@@ -62,6 +63,11 @@ int main(int argc,char **argv)
 
 			if(strcmp(cmd->data,"quit") == 0){
 				return 0;
+			}
+
+			if(strcmp(cmd->data,"disas")){
+				ds_disassemble(&file->image[offset],&ins_buff);
+				printf("0x%08x :  %s\n",offset,&ins_buff);
 			}
 		}
 		
