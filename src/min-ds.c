@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -17,6 +18,19 @@ static uint8_t *help_cmd = "info           : Displays various file info\n"
 static void set_prompt_offset(uint8_t *prompt,uint32_t offset)
 {
 	sprintf(prompt,"\x1b[33m[dis : 0x%08x]>\x1b[0m",offset);
+}
+
+static void disassemble(minfile *file,uint32_t offset,uint32_t count)
+{
+	uint8_t ins_buff[64];
+	uint32_t len = 0;
+
+	while(count > 0 && offset < file->size){
+		len = ds_disassemble(&file->image[offset],&ins_buff);
+		printf("0x%08x :  %s\n",offset,&ins_buff);
+		offset += len;
+		count -= 1;
+	}
 }
 
 int main(int argc,char **argv)
@@ -66,8 +80,11 @@ int main(int argc,char **argv)
 			}
 
 			if(strcmp(cmd->data,"disas")){
-				ds_disassemble(&file->image[offset],&ins_buff);
-				printf("0x%08x :  %s\n",offset,&ins_buff);
+				uint32_t len;
+				node *n = cmd->next;
+				if(n != NULL){
+					disassemble(file,offset,5);
+				}
 			}
 		}
 		
