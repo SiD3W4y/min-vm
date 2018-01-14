@@ -8,12 +8,14 @@
 #include "utils/list.h"
 #include "utils/console.h"
 #include "utils/log.h"
+#include "utils/numbers.h"
 
 static uint8_t *usage = "usage : ./min-ds <input file>\n";
 
 static uint8_t *help_cmd = "info           : Displays various file info\n"
 			"quit           : Exits the disassembler\n"
-			"s <hex offset> : Seeks to the given offset\n";
+			"s <hex offset> : Seeks to the given offset\n"
+		        "ds <len>       : Disassemble len instructions from current seek\n";
 
 static void set_prompt_offset(uint8_t *prompt,uint32_t offset)
 {
@@ -32,6 +34,7 @@ static void disassemble(minfile *file,uint32_t offset,uint32_t count)
 		count -= 1;
 	}
 }
+
 
 int main(int argc,char **argv)
 {
@@ -79,12 +82,32 @@ int main(int argc,char **argv)
 				return 0;
 			}
 
-			if(strcmp(cmd->data,"disas")){
-				uint32_t len;
+			if(strcmp(cmd->data,"ds") == 0){
+				uint32_t len = 0;
 				node *n = cmd->next;
+
 				if(n != NULL){
-					disassemble(file,offset,5);
+					len = num_tou32(n->data);
+					
+					if(len != 0){
+						disassemble(file,offset,len);
+					}
 				}
+			}
+
+			if(strcmp(cmd->data,"s") == 0){
+				node *n = cmd->next;
+				
+				if(n != NULL){
+					offset = num_tou32(n->data);
+
+					if(offset > file->size){
+						log_error("Invalid seek\n");
+						offset = file->size;
+					}
+				}
+
+				set_prompt_offset(&prompt,offset);
 			}
 		}
 		
