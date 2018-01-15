@@ -100,30 +100,26 @@ vm_state *vm_new()
 	return st;
 }
 
-vm_opcode vm_get_op(vm_state *st)
+static void vm_get_op(vm_state *st,vm_opcode *opc)
 {
-	vm_opcode opc;
+	opc->op = VM_GET_BYTE(st); // Get opcode
+	parse_cond(opc,VM_GET_BYTE(st)); // Parse them and put the result in opcode struct
 
-	opc.op = VM_GET_BYTE(st); // Get opcode
-	parse_cond(&opc,VM_GET_BYTE(st)); // Parse them and put the result in opcode struct
-
-	if(opc.first_reg == true){
-		opc.first_value = bytes_to_short(&st->memory[st->ip]);
+	if(opc->first_reg == true){
+		opc->first_value = bytes_to_short(&st->memory[st->ip]);
 		st->ip += 2;
 	}else{
-		opc.first_value = bytes_to_int(&st->memory[st->ip]);
+		opc->first_value = bytes_to_int(&st->memory[st->ip]);
 		st->ip += 4;
 	}
 
-	if(opc.second_reg == true){
-		opc.second_value = bytes_to_short(&st->memory[st->ip]);
+	if(opc->second_reg == true){
+		opc->second_value = bytes_to_short(&st->memory[st->ip]);
 		st->ip += 2;
 	}else{
-		opc.second_value = bytes_to_int(&st->memory[st->ip]);
+		opc->second_value = bytes_to_int(&st->memory[st->ip]);
 		st->ip += 4;
 	}
-
-	return opc;
 }
 
 int vm_syscall(vm_state *st,int syscall)
@@ -147,8 +143,9 @@ int vm_syscall(vm_state *st,int syscall)
 
 int vm_execute(vm_state *st)
 {
+	vm_opcode op;
 	while(st->ip < st->binary_size){	
-		vm_opcode op = vm_get_op(st);
+		vm_get_op(st,&op);
 
 		if(st->debug == 2){
 			log_tracing("0x%08x : %s %d %d\n",st->ip,OP_NAMES[op.op],op.first_value,op.second_value);

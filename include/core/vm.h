@@ -22,7 +22,6 @@ typedef struct st_vm_state{
 vm_state *vm_new();
 int vm_load_file(vm_state *st,char *path);
 int vm_execute(vm_state *st);
-vm_opcode vm_get_op(vm_state *st);
 int vm_syscall(vm_state *st,int syscall);
 
 
