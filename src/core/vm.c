@@ -47,9 +47,7 @@ static void parse_cond(vm_opcode *op,unsigned char data)
 
 static void vm_print_regs(vm_state *st) // Debug function ?
 {
-	log_info("Register state\n");
-	int i;
-	for(i=0;i < VM_REG_COUNT;i++){
+	for(int i=0;i < VM_REG_COUNT;i++){
 		log_info("%s : 0x%08x\n",OP_REGS[i],st->regs[i]);
 	}
 }
@@ -139,7 +137,7 @@ int vm_syscall(vm_state *st,int syscall)
 			break;
 		case SYS_EXIT:
 			if(st->debug > 0){
-			log_syscall("exit(code -> %d)\n",st->regs[1]);
+				log_syscall("exit(code -> %d)\n",st->regs[1]);
 			}
 			exit(st->regs[2]);
 	}
@@ -179,6 +177,43 @@ int vm_execute(vm_state *st)
 					}
 				}else{
 					log_error("LDR : First agument not a register\n");
+					return -1;
+				}
+				break;
+			case OP_LDRB:
+				if(op.first_reg == true){
+					st->regs[op.first_value] ^= st->regs[op.first_value];
+					if(op.second_reg == true){
+						memcpy(&st->regs[op.first_value],&st->memory[st->regs[op.second_value]],1);
+					}else{
+						memcpy(&st->regs[op.first_value],&st->memory[op.second_value],1);
+					}
+				}else{
+					log_error("LDRB : First agument not a register\n");
+					return -1;
+				}
+				break;		
+			case OP_STR:
+				if(op.first_reg == true){
+					if(op.second_reg == true){
+						memcpy(&st->memory[st->regs[op.second_value]],&st->regs[op.first_value],4);
+					}else{
+						memcpy(&st->memory[op.second_value],&st->regs[op.first_value],4);
+					}
+				}else{
+					log_error("STR : First agument not a register\n");
+					return -1;
+				}
+				break;
+			case OP_STRB:
+				if(op.first_reg == true){
+					if(op.second_reg == true){
+						memcpy(&st->memory[st->regs[op.second_value]],&st->regs[op.first_value],1);
+					}else{
+						memcpy(&st->memory[op.second_value],&st->regs[op.first_value],1);
+					}
+				}else{
+					log_error("STR : First agument not a register\n");
 					return -1;
 				}
 				break;
@@ -253,10 +288,6 @@ int vm_execute(vm_state *st)
 					log_error("JBE first argument must be a value\n");
 				}
 				break;
-
-
-
-
 
 			case OP_ADD:
 				if(op.first_reg == true){
@@ -374,8 +405,6 @@ int vm_execute(vm_state *st)
 						rhs = st->regs[rhs];
 					}	
 					
-					
-
 					if(lhs == rhs){
 						st->flags[0] = 1;
 					}else{

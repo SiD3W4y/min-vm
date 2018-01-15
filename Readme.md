@@ -25,9 +25,9 @@ If you want for whatever reason to compile some min assembly, you can use the co
     * [x] **mul** {r} {r,n}
     * [x] **mov** {r} {r,n,a}
     * [x] **ldr** {r} {r,a}
-    * [ ] **ldrb** {r} {r,a}
-    * [ ] **str** {r} {r,a}
-    * [ ] **strb** {r} {r,a}
+    * [x] **ldrb** {r} {r,a}
+    * [x] **str** {r} {r,a}
+    * [x] **strb** {r} {r,a}
     * [ ] **push** {r} 
     * [ ] **pop** {r}
     * [x] **cmp** {r} {r,n}
