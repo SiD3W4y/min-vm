@@ -24,10 +24,10 @@ If you want for whatever reason to compile some min assembly, you can use the co
     * [x] **sub** {r} {r,n} 
     * [x] **mul** {r} {r,n}
     * [x] **mov** {r} {r,n,a}
-    * [x] **ldr** {r} {a}
-    * [ ] **ldrb** {r} {a}
-    * [ ] **str** {r} {a}
-    * [ ] **strb** {r} {a}
+    * [x] **ldr** {r} {r,a}
+    * [ ] **ldrb** {r} {r,a}
+    * [ ] **str** {r} {r,a}
+    * [ ] **strb** {r} {r,a}
     * [ ] **push** {r} 
     * [ ] **pop** {r}
     * [x] **cmp** {r} {r,n}
