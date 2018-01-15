@@ -33,7 +33,9 @@ list *console_tokenize(console *c)
 	uint8_t token[CONSOLE_LINE_SIZE];
 	uint8_t *ptr = &buff;
 	uint32_t index = 0;
-	list *toks = list_new();
+
+	// Cleaning our list
+	list_empty(c->tokens);
 
 	console_getline(c,buff,CONSOLE_LINE_SIZE-1);
 	
@@ -45,7 +47,7 @@ list *console_tokenize(console *c)
 		}else{
 			if(index != 0){
 				token[index] = '\x00';
-				list_append(toks,node_new(strdup(token)));
+				list_append(c->tokens,node_new(strdup(token)));
 				index = 0;
 				ptr++;
 			}else{
@@ -56,8 +58,8 @@ list *console_tokenize(console *c)
 
 	if(index > 0){
 		token[index] = '\x00';
-		list_append(toks,node_new(strdup(token)));
+		list_append(c->tokens,node_new(strdup(token)));
 	}
 
-	return toks;
+	return c->tokens;
 }

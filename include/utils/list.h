@@ -17,6 +17,7 @@ node *node_new(void *data);
 list *list_new();
 void list_append(list *lst,node *elem);
 void list_pop(list *lst);
+void list_empty(list *lst);
 void list_free(list *lst);
 
 #endif

@@ -59,17 +59,26 @@ void list_pop(list *lst)
 	}
 }
 
-void list_free(list *lst)
+void list_empty(list *lst)
 {
 	node *n = lst->head;
 	node *c;
-
-	while(n->next != NULL){
-		c = n->next;
-		free(n->data);
-		free(n);
-		n = c;
+	
+	if(lst->head != NULL){
+		while(n->next != NULL){
+			c = n->next;
+			free(n->data);
+			free(n);
+			n = c;
+		}
 	}
 
+	lst->head = NULL;
+	lst->tail = NULL;
+}
+
+void list_free(list *lst)
+{
+	list_empty(lst);
 	free(lst);
 }
