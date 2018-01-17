@@ -7,6 +7,9 @@
 #define VM_REG_COUNT 8
 #define VM_FLAG_COUNT 3
 
+#define REG_BP 0x6
+#define REG_SP 0x7
+
 typedef struct st_vm_state{
 	int regs[VM_REG_COUNT]; // A B C D E F BP SP
 	int ip;

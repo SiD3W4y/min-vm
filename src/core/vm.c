@@ -352,6 +352,21 @@ int vm_step(vm_state *st)
 			if(st->debug > 0)
 				log_info("0x%08x : CMP %d %d [Z = %d,H = %d,L = %d]\n",st->ip,lhs,rhs,st->flags[0],st->flags[1],st->flags[2]);
 			break;
+
+		case OP_PUSH:
+			VM_ARG_REG(op);
+			
+			st->regs[REG_SP] -= sizeof(uint32_t);
+			memcpy(&st->memory[st->regs[REG_SP]],&st->regs[op.first_value],sizeof(uint32_t));
+			
+			break;
+		case OP_POP:
+			VM_ARG_REG(op);
+			
+			memcpy(,&st->regs[op.first_value],&st->memory[st->regs[REG_SP]],sizeof(uint32_t));
+			st->regs[REG_SP] += sizeof(uint32_t);
+
+			break;
 	}
 
 	return 0;
