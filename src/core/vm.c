@@ -13,6 +13,16 @@
 
 #define VM_GET_BYTE(vm) vm->memory[vm->ip++]
 
+// First argument is always a register or value
+
+#define VM_ARG_REG(op) if(!op.first_reg){\
+	log_error("Wrong argument on op 0x%02x\n (REG expected)",op.op);\
+	return -1;}
+
+#define VM_ARG_VAL(op) if(!op.first_reg){\
+	log_error("Wrong argument on op 0x%02x\n (VAL expected)",op.op);\
+	return -1;}
+
 static int bytes_to_int(unsigned char *buff)
 {
 	int result = 0;
@@ -141,293 +151,237 @@ int vm_syscall(vm_state *st,int syscall)
 	return 0;
 }
 
+// Fully runs a program
 int vm_execute(vm_state *st)
 {
+	int status = 0;
+	while(st->ip < st->binary_size || status == 0){
+		status = vm_step(st);
+	}
+
+	if(status != 0)
+		log_error("Execution aborted\n");
+	
+	return status;
+}
+
+// Executes only one instruction
+int vm_step(vm_state *st)
+{
 	vm_opcode op;
-	while(st->ip < st->binary_size){	
-		vm_get_op(st,&op);
+	vm_get_op(st,&op);
 
-		if(st->debug == 2){
-			log_tracing("0x%08x : %s %d %d\n",st->ip,OP_NAMES[op.op],op.first_value,op.second_value);
-		}
+	if(st->debug == 2){
+		log_tracing("0x%08x : %s %d %d\n",st->ip,OP_NAMES[op.op],op.first_value,op.second_value);
+	}
 
 
-		switch(op.op){
-			case OP_MOV:
-				if(op.first_reg == true){
-					if(op.second_reg == true){
-						st->regs[op.first_value] = st->regs[op.second_value];
-					}else{
-						st->regs[op.first_value] = op.second_value;
-					}
-				}else{
-					log_error("MOV : Error wrong argument combination\n");
-					return -1;
-				}
-				break;
-			case OP_LDR:
-				if(op.first_reg == true){
-					if(op.second_reg == true){
-						memcpy(&st->regs[op.first_value],&st->memory[st->regs[op.second_value]],4);
-					}else{
-						memcpy(&st->regs[op.first_value],&st->memory[op.second_value],4);
-					}
-				}else{
-					log_error("LDR : First agument not a register\n");
-					return -1;
-				}
-				break;
-			case OP_LDRB:
-				if(op.first_reg == true){
-					st->regs[op.first_value] ^= st->regs[op.first_value];
-					if(op.second_reg == true){
-						memcpy(&st->regs[op.first_value],&st->memory[st->regs[op.second_value]],1);
-					}else{
-						memcpy(&st->regs[op.first_value],&st->memory[op.second_value],1);
-					}
-				}else{
-					log_error("LDRB : First agument not a register\n");
-					return -1;
-				}
-				break;		
-			case OP_STR:
-				if(op.first_reg == true){
-					if(op.second_reg == true){
-						memcpy(&st->memory[st->regs[op.second_value]],&st->regs[op.first_value],4);
-					}else{
-						memcpy(&st->memory[op.second_value],&st->regs[op.first_value],4);
-					}
-				}else{
-					log_error("STR : First agument not a register\n");
-					return -1;
-				}
-				break;
-			case OP_STRB:
-				if(op.first_reg == true){
-					if(op.second_reg == true){
-						memcpy(&st->memory[st->regs[op.second_value]],&st->regs[op.first_value],1);
-					}else{
-						memcpy(&st->memory[op.second_value],&st->regs[op.first_value],1);
-					}
-				}else{
-					log_error("STR : First agument not a register\n");
-					return -1;
-				}
-				break;
-			case OP_SYS:
-				vm_syscall(st,st->regs[0]);
-				break;
-			case OP_JMP:
-				if(op.first_reg == false){
-					st->ip = op.first_value;
+	switch(op.op){
+		case OP_MOV:
+			VM_ARG_REG(op);
+			
+			if(op.second_reg)
+				st->regs[op.first_value] = st->regs[op.second_value];
+			else
+				st->regs[op.first_value] = op.second_value;
 
-					if(st->debug > 0){
-						log_info("jmp 0x%08x\n",st->ip);
-					}
-				}else{
-					log_error("JMP : First argument must be a value\n");
-					return -1;
-				}
-				break;
-			case OP_JNE:
-				if(op.first_reg == false){
-					if(st->flags[0] == 0){
-						st->ip = op.first_value;
-					}
-
-					if(st->debug > 0){
-						log_info("jne 0x%08x\n",st->ip);
-					}
-
-				}else{
-					log_error("JNE first argument must be a value\n");
-				}
-				break;
-			case OP_JE:
-				if(op.first_reg == false){
-					if(st->flags[0] == 1){
-						st->ip = op.first_value;
-					}
-
-					if(st->debug > 0){
-						log_info("je 0x%08x\n",st->ip);
-					}
-
-				}else{
-					log_error("JE first argument must be a value\n");
-				}
-				break;
-			case OP_JLE:
-				if(op.first_reg == false){
-					if(st->flags[2] == 1){
-						st->ip = op.first_value;
-					}
-
-					if(st->debug > 0){
-						log_info("jle 0x%08x\n",st->ip);
-					}
-
-				}else{
-					log_error("JLE first argument must be a value\n");
-				}
-				break;
-			case OP_JBE:
-				if(op.first_reg == false){
-					if(st->flags[1] == 1){
-						st->ip = op.first_value;
-					}
-
-					if(st->debug > 0){
-						log_info("jbe 0x%08x\n",st->ip);
-					}
-
-				}else{
-					log_error("JBE first argument must be a value\n");
-				}
-				break;
-
-			case OP_ADD:
-				if(op.first_reg == true){
-					if(op.second_reg == true){
-						st->regs[op.first_value] += st->regs[op.second_value];
-					}else{
-						st->regs[op.first_value] += op.second_value;
-					}
-				}else{
-					log_error("ADD first argument must be a register !\n");
-					return -1;
-				}
-				break;
-
-			case OP_SUB:
-				if(op.first_reg == true){
-					if(op.second_reg == true){
-						st->regs[op.first_value] -= st->regs[op.second_value];
-					}else{
-						st->regs[op.first_value] -= op.second_value;
-					}
-				}else{
-					log_error("SUB first argument must be a register !\n");
-					return -1;
-				}
-				break;
-
-			case OP_MUL:
-				if(op.first_reg == true){
-					if(op.second_reg == true){
-						st->regs[op.first_value] *= st->regs[op.second_value];
-					}else{
-						st->regs[op.first_value] *= op.second_value;
-					}
-				}else{
-					log_error("MUL first argument must be a register !\n");
-					return -1;
-				}
-				break;
-
-			case OP_XOR:
-				if(op.first_reg == true){
-					if(op.second_reg == true){
-						st->regs[op.first_value] ^= st->regs[op.second_value];
-					}else{
-						st->regs[op.first_value] ^= op.second_value;
-					}
-
-				}else{
-					log_error("XOR first argument must be a register !\n");
-					return -1;
-				}
-				break;
-			case OP_OR:
-			if(op.first_reg == true){
-				if(op.second_reg == true){
-					st->regs[op.first_value] |= st->regs[op.second_value];
-				}else{
-					st->regs[op.first_value] |= op.second_value;
-				}
-
-			}else{
-				log_error("OR first argument must be a register !\n");
-				return -1;
-			}
 			break;
-			case OP_AND:
-				if(op.first_reg == true){
-					if(op.second_reg == true){
-						st->regs[op.first_value] &= st->regs[op.second_value];
-					}else{
-						st->regs[op.first_value] &= op.second_value;
-					}
+		case OP_LDR:
+			VM_ARG_REG(op);
+			
+			if(op.second_reg)
+				memcpy(&st->regs[op.first_value],&st->memory[st->regs[op.second_value]],4);
+			else
+				memcpy(&st->regs[op.first_value],&st->memory[op.second_value],4);
+			
+			break;
+		case OP_LDRB:
+			VM_ARG_REG(op);
+			st->regs[op.first_value] ^= st->regs[op.first_value];
+			
+			if(op.second_reg)
+				memcpy(&st->regs[op.first_value],&st->memory[st->regs[op.second_value]],1);
+			else
+				memcpy(&st->regs[op.first_value],&st->memory[op.second_value],1);
+			
+			break;		
+		case OP_STR:
+			VM_ARG_REG(op);
+			
+			if(op.second_reg)
+				memcpy(&st->memory[st->regs[op.second_value]],&st->regs[op.first_value],4);
+			else
+				memcpy(&st->memory[op.second_value],&st->regs[op.first_value],4);
+			
+			break;
+		case OP_STRB:
+			VM_ARG_REG(op);
+			
+			if(op.second_reg)
+				memcpy(&st->memory[st->regs[op.second_value]],&st->regs[op.first_value],1);
+			else
+				memcpy(&st->memory[op.second_value],&st->regs[op.first_value],1);
+				
+			break;
+		case OP_SYS:
+			vm_syscall(st,st->regs[0]);
+			break;
+		case OP_JMP:
+			VM_ARG_VAL(op);
+			st->ip = op.first_value;
 
-				}else{
-					log_error("AND first argument must be a register !\n");
-					return -1;
-				}
-				break;
-			case OP_SHR:
-				if(op.first_reg == true){
-					if(op.second_reg == true){
-						st->regs[op.first_value] >>= st->regs[op.second_value];
-					}else{
-						st->regs[op.first_value] >>= op.second_value;
-					}
+			if(st->debug > 0)
+				log_info("jmp 0x%08x\n",st->ip);
 
-				}else{
-					log_error("SHR first argument must be a register !\n");
-					return -1;
-				}
-				break;
-			case OP_SHL:
-				if(op.first_reg == true){
-					if(op.second_reg == true){
-						st->regs[op.first_value] <<= st->regs[op.second_value];
-					}else{
-						st->regs[op.first_value] <<= op.second_value;
-					}
+			break;
+		case OP_JNE:
+			VM_ARG_VAL(op);
+			
+			if(st->flags[0] == 0)
+				st->ip = op.first_value;
 
-				}else{
-					log_error("SHL first argument must be a register !\n");
-					return -1;
-				}
-				break;
-			case OP_CMP:
-				if(op.first_reg == true){
-					// st->flags[0] is Z flag : ==
-					// st->flags[1] is H flag : >
-					// st->flags[2] is L flag : <
-					int lhs = st->regs[op.first_value];
-					int rhs = op.second_value;
+			if(st->debug > 0)
+				log_info("jne 0x%08x\n",st->ip);
+				
+			break;
+		case OP_JE:
+			VM_ARG_VAL(op);
+			
+			if(st->flags[0] == 1)
+				st->ip = op.first_value;
+			
+			if(st->debug > 0)
+				log_info("je 0x%08x\n",st->ip);
+			
+			break;
+		case OP_JLE:
+			VM_ARG_VAL(op);
 
-					if(op.second_reg == true){
-						rhs = st->regs[rhs];
-					}	
-					
-					if(lhs == rhs){
-						st->flags[0] = 1;
-					}else{
-						st->flags[0] = 0;
-					}
+			if(st->flags[2] == 1)
+				st->ip = op.first_value;
 
-					if(lhs > rhs){
-						st->flags[1] = 1;
-					}else{
-						st->flags[1] = 0;
-					}
+			if(st->debug > 0)
+				log_info("jle 0x%08x\n",st->ip);
+			
+			break;
+		case OP_JBE:
+			VM_ARG_VAL(op);
 
-					if(lhs < rhs){
-						st->flags[2] = 1;
-					}else{
-						st->flags[2] = 0;
-					}
+			if(st->flags[1] == 1)
+				st->ip = op.first_value;
 
-					if(st->debug > 0){
-						log_info("0x%08x : CMP %d %d [Z = %d,H = %d,L = %d]\n",st->ip,lhs,rhs,st->flags[0],st->flags[1],st->flags[2]);
-					}
-				}else{
-					log_error("CMP first argument must be a register !\n");
-				}
-				break;
-		}
+			if(st->debug > 0)
+				log_info("jbe 0x%08x\n",st->ip);
+
+			break;
+
+		case OP_ADD:
+			VM_ARG_REG(op);
+			
+			if(op.second_reg)
+				st->regs[op.first_value] += st->regs[op.second_value];
+			else
+				st->regs[op.first_value] += op.second_value;
+			
+			break;
+
+		case OP_SUB:
+			VM_ARG_REG(op);
+
+			if(op.second_reg)
+				st->regs[op.first_value] -= st->regs[op.second_value];
+			else
+				st->regs[op.first_value] -= op.second_value;
+		
+			break;
+
+		case OP_MUL:
+			VM_ARG_REG(op);
+
+			if(op.second_reg)
+				st->regs[op.first_value] *= st->regs[op.second_value];
+			else
+				st->regs[op.first_value] *= op.second_value;
+
+			break;
+
+		case OP_XOR:
+			VM_ARG_REG(op);
+
+			if(op.second_reg)
+				st->regs[op.first_value] ^= st->regs[op.second_value];
+			else
+				st->regs[op.first_value] ^= op.second_value;
+
+			break;
+		case OP_OR:
+			VM_ARG_REG(op);
+
+			if(op.second_reg)
+				st->regs[op.first_value] |= st->regs[op.second_value];
+			else
+				st->regs[op.first_value] |= op.second_value;
+
+			break;
+		case OP_AND:
+			VM_ARG_REG(op);
+
+			if(op.second_reg)
+				st->regs[op.first_value] &= st->regs[op.second_value];
+			else
+				st->regs[op.first_value] &= op.second_value;
+
+			break;
+		case OP_SHR:
+			VM_ARG_REG(op);
+			
+			if(op.second_reg)
+				st->regs[op.first_value] >>= st->regs[op.second_value];
+			else
+				st->regs[op.first_value] >>= op.second_value;
+
+			break;
+		case OP_SHL:
+			VM_ARG_REG(op);
+
+			if(op.second_reg)
+				st->regs[op.first_value] <<= st->regs[op.second_value];
+			else
+				st->regs[op.first_value] <<= op.second_value;
+
+			break;
+		case OP_CMP:
+			VM_ARG_REG(op);
+			// st->flags[0] is Z flag : ==
+			// st->flags[1] is H flag : >
+			// st->flags[2] is L flag : <
+			int lhs = st->regs[op.first_value];
+			int rhs = op.second_value;
+
+			if(op.second_reg)
+				rhs = st->regs[rhs];
+			
+			if(lhs == rhs){
+				st->flags[0] = 1;
+			}else{
+				st->flags[0] = 0;
+			}
+
+			if(lhs > rhs){
+				st->flags[1] = 1;
+			}else{
+				st->flags[1] = 0;
+			}
+
+			if(lhs < rhs){
+				st->flags[2] = 1;
+			}else{
+				st->flags[2] = 0;
+			}
+
+			if(st->debug > 0)
+				log_info("0x%08x : CMP %d %d [Z = %d,H = %d,L = %d]\n",st->ip,lhs,rhs,st->flags[0],st->flags[1],st->flags[2]);
+			break;
 	}
 
 	return 0;
