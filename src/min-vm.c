@@ -15,7 +15,7 @@ int main(int argc,char **argv)
 	vm_state *vm = vm_new();
 
 	if(argc != 3){
-		printf(usage);
+		printf("%s",usage);
 		return -1;
 	}
 
@@ -39,6 +39,8 @@ int main(int argc,char **argv)
 		printf("%s : Not a valid flag !\n",mode);
 		return -1;
 	}
+
+	vm_free(vm);
 
 	return 0;
 }
