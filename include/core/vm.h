@@ -20,6 +20,7 @@ typedef struct st_vm_state{
 }vm_state;
 
 vm_state *vm_new();
+void vm_free(vm_state *st);
 int vm_load_file(vm_state *st,char *path);
 int vm_execute(vm_state *st);
 int vm_step(vm_state *st);

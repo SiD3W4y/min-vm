@@ -14,53 +14,13 @@
 #define VM_GET_BYTE(vm) vm->memory[vm->ip++]
 
 // First argument is always a register or value
-
 #define VM_ARG_REG(op) if(!op.first_reg){\
-	log_error("Wrong argument on op 0x%02x\n (REG expected)",op.op);\
+	log_error("Wrong argument on op 0x%02x (REG expected)\n",op.op);\
 	return -1;}
 
-#define VM_ARG_VAL(op) if(!op.first_reg){\
-	log_error("Wrong argument on op 0x%02x\n (VAL expected)",op.op);\
+#define VM_ARG_VAL(op) if(op.first_reg){\
+	log_error("Wrong argument on op 0x%02x (VAL expected)\n",op.op);\
 	return -1;}
-
-static int bytes_to_int(unsigned char *buff)
-{
-	int result = 0;
-
-	result |= buff[3];
-	result = result << 8;
-	result |= buff[2];
-	result = result << 8;
-	result |= buff[1];
-	result = result << 8;
-	result |= buff[0];
-
-	return result;
-}
-
-static short bytes_to_short(unsigned char *buff)
-{
-	short result = 0;
-
-	result |= buff[1];
-	result = result << 8;
-	result |= buff[0];
-
-	return result;
-}
-
-static void parse_cond(vm_opcode *op,unsigned char data)
-{
-	op->first_reg = data & 0x01;
-	op->second_reg = (data >> 1) & 0x01;
-}
-
-static void vm_print_regs(vm_state *st) // Debug function ?
-{
-	for(int i=0;i < VM_REG_COUNT;i++){
-		log_info("%s : 0x%08x\n",OP_REGS[i],st->regs[i]);
-	}
-}
 
 int vm_load_file(vm_state *st,char *path)
 {
@@ -110,24 +70,34 @@ vm_state *vm_new()
 	return st;
 }
 
+void vm_free(vm_state *st)
+{
+	free(st->memory);
+	free(st);
+}
+
 static void vm_get_op(vm_state *st,vm_opcode *opc)
 {
+	uint8_t control_op;
 	opc->op = VM_GET_BYTE(st); // Get opcode
-	parse_cond(opc,VM_GET_BYTE(st)); // Parse them and put the result in opcode struct
+	control_op = VM_GET_BYTE(st);
 
-	if(opc->first_reg == true){
-		opc->first_value = bytes_to_short(&st->memory[st->ip]);
+	opc->first_reg = control_op & 0x01;
+	opc->second_reg = (control_op >> 1) & 0x01;
+
+	if(opc->first_reg){
+		opc->first_value = (uint16_t)(*&st->memory[st->ip]);
 		st->ip += 2;
 	}else{
-		opc->first_value = bytes_to_int(&st->memory[st->ip]);
+		opc->first_value = (uint32_t)(*&st->memory[st->ip]);
 		st->ip += 4;
 	}
 
-	if(opc->second_reg == true){
-		opc->second_value = bytes_to_short(&st->memory[st->ip]);
+	if(opc->second_reg){
+		opc->second_value = (uint16_t)(*&st->memory[st->ip]);
 		st->ip += 2;
 	}else{
-		opc->second_value = bytes_to_int(&st->memory[st->ip]);
+		opc->second_value = (uint32_t)(*&st->memory[st->ip]);
 		st->ip += 4;
 	}
 }
@@ -155,7 +125,7 @@ int vm_syscall(vm_state *st,int syscall)
 int vm_execute(vm_state *st)
 {
 	int status = 0;
-	while(st->ip < st->binary_size || status == 0){
+	while(st->ip < st->binary_size && status == 0){
 		status = vm_step(st);
 	}
 
