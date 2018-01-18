@@ -28,8 +28,8 @@ If you want for whatever reason to compile some min assembly, you can use the co
     * [x] **ldrb** {r} {r,a}
     * [x] **str** {r} {r,a}
     * [x] **strb** {r} {r,a}
-    * [ ] **push** {r} 
-    * [ ] **pop** {r}
+    * [x] **push** {r} 
+    * [x] **pop** {r}
     * [x] **cmp** {r} {r,n}
     * [x] **jmp** {a}
     * [x] **jne** {a}
@@ -44,3 +44,19 @@ If you want for whatever reason to compile some min assembly, you can use the co
     * [x] **shl** {r} {r,n}
 
 
+## Disassembly
+It is possible to disassemble min bytecode using the radare2 plugin in r2-plugin folder or use the project's
+own disassembler.
+
+### Install r2 plugin
+```
+$ cd r2-plugin/
+$ make
+$ make install
+<use "e asm.arch = min" in r2>
+```
+
+### Compile toy disassembler
+```
+$ make min-ds
+```
