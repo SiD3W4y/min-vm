@@ -9,7 +9,7 @@ static int disassemble(RAsm *a,RAsmOp *op,const ut8 *b,int l)
 	return op->size;
 }
 
-RAsmPlugin r_asm_plugin_zpu = {
+RAsmPlugin r_asm_plugin_min = {
 	.name = "min",
 	.arch = "min",
 	.license = "none",
@@ -21,6 +21,6 @@ RAsmPlugin r_asm_plugin_zpu = {
 #ifndef CORELIB
 RLibStruct radare_plugin = {
 	.type = R_LIB_TYPE_ASM,
-	.data = &r_asm_plugin_zpu
+	.data = &r_asm_plugin_min
 };
 #endif
