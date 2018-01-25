@@ -117,6 +117,13 @@ int vm_syscall(vm_state *st,int syscall)
 			}
 			write(st->regs[1],&st->memory[st->regs[2]],st->regs[3]);
 			break;
+		case SYS_READ:
+			if(st->debug > 0){
+				log_syscall("read(fd -> %d, addr -> 0x%08x, size -> %d)\n",st->regs[1],st->regs[2],st->regs[3]);
+			}
+			read(st->regs[1],&st->memory[st->regs[2]],st->regs[3]);
+			break;
+			
 		case SYS_EXIT:
 			if(st->debug > 0){
 				log_syscall("exit(code -> %d)\n",st->regs[1]);
