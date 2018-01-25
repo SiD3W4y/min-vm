@@ -79,6 +79,8 @@ void vm_free(vm_state *st)
 static void vm_get_op(vm_state *st,vm_opcode *opc)
 {
 	uint8_t control_op;
+	uint16_t *reg_val;
+	uint32_t *imm_val;
 	opc->op = VM_GET_BYTE(st); // Get opcode
 	control_op = VM_GET_BYTE(st);
 
@@ -86,18 +88,22 @@ static void vm_get_op(vm_state *st,vm_opcode *opc)
 	opc->second_reg = (control_op >> 1) & 0x01;
 
 	if(opc->first_reg){
-		opc->first_value = (uint16_t)(*&st->memory[st->ip]);
+		reg_val = &st->memory[st->ip];
+		opc->first_value = reg_val[0];
 		st->ip += 2;
 	}else{
-		opc->first_value = (uint32_t)(*&st->memory[st->ip]);
+		imm_val = &st->memory[st->ip];
+		opc->first_value = imm_val[0];
 		st->ip += 4;
 	}
 
 	if(opc->second_reg){
-		opc->second_value = (uint16_t)(*&st->memory[st->ip]);
+		reg_val = &st->memory[st->ip];
+		opc->second_value = reg_val[0];
 		st->ip += 2;
 	}else{
-		opc->second_value = (uint32_t)(*&st->memory[st->ip]);
+		imm_val = &st->memory[st->ip];
+		opc->second_value = imm_val[0];
 		st->ip += 4;
 	}
 }
