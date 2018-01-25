@@ -363,7 +363,7 @@ int vm_step(vm_state *st)
 		case OP_POP:
 			VM_ARG_REG(op);
 			
-			memcpy(,&st->regs[op.first_value],&st->memory[st->regs[REG_SP]],sizeof(uint32_t));
+			memcpy(&st->regs[op.first_value],&st->memory[st->regs[REG_SP]],sizeof(uint32_t));
 			st->regs[REG_SP] += sizeof(uint32_t);
 
 			break;
