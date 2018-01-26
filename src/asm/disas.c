@@ -56,7 +56,18 @@ uint32_t ds_disassemble(uint8_t *input_bytes,uint8_t *output)
 		op.first_value = u16_from_stream(&input_bytes[2]);
 		op.second_value = u16_from_stream(&input_bytes[4]);
 
-		sprintf(output,"%s $%s $%s",OP_NAMES[op.op],OP_REGS[op.first_value],OP_REGS[op.second_value]);
+		switch(op.op){
+			case OP_PUSH:
+			case OP_POP:
+				sprintf(output,"%s $%s",OP_NAMES[op.op],OP_REGS[op.first_value]);
+				break;
+			case OP_SYS:
+				sprintf(output,"%s",OP_NAMES[op.op]);
+				break;
+			default:
+				sprintf(output,"%s $%s $%s",OP_NAMES[op.op],OP_REGS[op.first_value],OP_REGS[op.second_value]);
+				break;
+		}
 
 		return 6;
 	}
@@ -64,8 +75,19 @@ uint32_t ds_disassemble(uint8_t *input_bytes,uint8_t *output)
 	if(op.first_reg == false && op.second_reg == true){
 		op.first_value = u32_from_stream(&input_bytes[2]);
 		op.second_value = u16_from_stream(&input_bytes[6]);
-
-		sprintf(output,"%s 0x%08x $%s",OP_NAMES[op.op],op.first_value,OP_REGS[op.second_value]);
+		
+		switch(op.op){
+			case OP_JMP:
+			case OP_JNE:
+			case OP_JE:
+			case OP_JLE:
+			case OP_JBE:
+				sprintf(output,"%s 0x%08x",OP_NAMES[op.op],op.first_value);
+				break;
+			default:
+				sprintf(output,"%s 0x%08x $%s",OP_NAMES[op.op],op.first_value,OP_REGS[op.second_value]);
+				break;
+		}
 
 		return 8;
 	}
