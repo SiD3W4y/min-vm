@@ -149,10 +149,15 @@ int vm_execute(vm_state *st)
 int vm_step(vm_state *st)
 {
 	vm_opcode op;
+	uint8_t *stream;
+	uint8_t asm_val[50];
+
+	stream = &st->memory[st->ip];
 	vm_get_op(st,&op);
 
 	if(st->debug == 2){
-		log_tracing("0x%08x : %s %d %d\n",st->ip,OP_NAMES[op.op],op.first_value,op.second_value);
+		ds_disassemble(stream,&asm_val);
+		log_tracing("0x%08x : %s\n",st->ip,asm_val);
 	}
 
 

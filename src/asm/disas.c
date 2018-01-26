@@ -5,7 +5,7 @@
 #include "asm/disas.h"
 #include "core/ops.h"
 
-const char* OP_NAMES[] = {"ADD","SUB","MUL","MOV","LDR","LDRB","STR","STRB","PUSH","POP","CMP","JMP","JNE","JE","JLE","JBE","SYS","XOR","AND","OR","SHR","SHL"};
+const char* OP_NAMES[] = {"add","sub","mul","mov","ldr","ldrb","str","strb","push","pop","cmp","jmp","jne","je","jle","jbe","sys","xor","and","or","shr","shl"};
 const char *OP_REGS[] = {"A","B","C","D","E","F","BP","SP"};
 
 static void parse_cond(vm_opcode *op,unsigned char data)
