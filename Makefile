@@ -1,4 +1,4 @@
-CFLAGS=-Wall --std=c99
+CFLAGS=-Wall -fPIC
 INCLUDES= -I include
 
 CORE_SRC=$(wildcard src/core/*.c)
