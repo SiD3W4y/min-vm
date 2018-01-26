@@ -4,6 +4,7 @@
 
 #include "asm/disas.h"
 #include "core/ops.h"
+#include "utils/numbers.h"
 
 const char* OP_NAMES[] = {"add","sub","mul","mov","ldr","ldrb","str","strb","push","pop","cmp","jmp","jne","je","jle","jbe","sys","xor","and","or","shr","shl"};
 const char *OP_REGS[] = {"A","B","C","D","E","F","BP","SP"};
