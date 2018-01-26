@@ -15,12 +15,13 @@ RAsmPlugin r_asm_plugin_min = {
 	.license = "none",
 	.bits = 32,
 	.desc = "min bytecode disassembler",
-	.disassemble = &disassemble,
+	.disassemble = &disassemble
 };
 
 #ifndef CORELIB
-RLibStruct radare_plugin = {
+struct r_lib_struct_t radare_plugin = {
 	.type = R_LIB_TYPE_ASM,
-	.data = &r_asm_plugin_min
+	.data = &r_asm_plugin_min,
+	.version = R2_VERSION
 };
 #endif

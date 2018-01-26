@@ -48,6 +48,8 @@ If you want for whatever reason to compile some min assembly, you can use the co
 It is possible to disassemble min bytecode using the radare2 plugin in r2-plugin folder or use the project's
 own disassembler.
 
+
+For an unknown reason the r2 plugin builds but radare does not find the plugin, so use the built-in disassembler for now.
 ### Install r2 plugin
 ```
 $ cd r2-plugin/
