@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 #include "core/minfile.h"
+#include "utils/numbers.h"
 
 minfile *minfile_new()
 {
@@ -15,7 +16,6 @@ minfile *minfile_new()
 int32_t minfile_load(minfile *file,uint8_t *path)
 {
 	FILE *fp;
-	uint32_t *size;
 	
 	fp = fopen(path,"rb");
 
@@ -44,8 +44,7 @@ int32_t minfile_load(minfile *file,uint8_t *path)
 		return MINFILE_ERROR;
 	}
 	
-	size = &file->image[2];
-	file->entrypoint = *size;
+	file->entrypoint = u32_from_stream(&file->image[2]);
 
 	return MINFILE_SUCCESS;
 }

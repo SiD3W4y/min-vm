@@ -10,6 +10,7 @@
 #include "core/minfile.h"
 #include "asm/disas.h"
 #include "utils/log.h"
+#include "utils/numbers.h"
 
 #define VM_GET_BYTE(vm) vm->memory[vm->ip++]
 
@@ -88,22 +89,18 @@ static void vm_get_op(vm_state *st,vm_opcode *opc)
 	opc->second_reg = (control_op >> 1) & 0x01;
 
 	if(opc->first_reg){
-		reg_val = &st->memory[st->ip];
-		opc->first_value = reg_val[0];
+		opc->first_value = u16_from_stream(&st->memory[st->ip]);
 		st->ip += 2;
 	}else{
-		imm_val = &st->memory[st->ip];
-		opc->first_value = imm_val[0];
+		opc->first_value = u32_from_stream(&st->memory[st->ip]);
 		st->ip += 4;
 	}
 
 	if(opc->second_reg){
-		reg_val = &st->memory[st->ip];
-		opc->second_value = reg_val[0];
+		opc->second_value = u16_from_stream(&st->memory[st->ip]);
 		st->ip += 2;
 	}else{
-		imm_val = &st->memory[st->ip];
-		opc->second_value = imm_val[0];
+		opc->second_value = u32_from_stream(&st->memory[st->ip]);
 		st->ip += 4;
 	}
 }

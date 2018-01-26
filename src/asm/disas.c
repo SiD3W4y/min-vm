@@ -53,8 +53,8 @@ uint32_t ds_disassemble(uint8_t *input_bytes,uint8_t *output)
 	parse_cond(&op,input_bytes[1]);
 	
 	if(op.first_reg == true && op.second_reg == true){
-		op.first_value = (uint16_t)(*&input_bytes[2]);
-		op.second_value = (uint16_t)(*&input_bytes[4]);
+		op.first_value = u16_from_stream(&input_bytes[2]);
+		op.second_value = u16_from_stream(&input_bytes[4]);
 
 		sprintf(output,"%s $%s $%s",OP_NAMES[op.op],OP_REGS[op.first_value],OP_REGS[op.second_value]);
 
@@ -62,8 +62,8 @@ uint32_t ds_disassemble(uint8_t *input_bytes,uint8_t *output)
 	}
 
 	if(op.first_reg == false && op.second_reg == true){
-		op.first_value = (uint32_t)(*&input_bytes[2]);
-		op.second_value = (uint16_t)(*&input_bytes[6]);
+		op.first_value = u32_from_stream(&input_bytes[2]);
+		op.second_value = u16_from_stream(&input_bytes[6]);
 
 		sprintf(output,"%s 0x%08x $%s",OP_NAMES[op.op],op.first_value,OP_REGS[op.second_value]);
 
@@ -71,8 +71,8 @@ uint32_t ds_disassemble(uint8_t *input_bytes,uint8_t *output)
 	}
 
 	if(op.first_reg == true && op.second_reg == false){
-		op.first_value = (uint16_t)(*&input_bytes[2]);
-		op.second_value = (uint32_t)(*&input_bytes[4]);
+		op.first_value = u16_from_stream(&input_bytes[2]);
+		op.second_value = u32_from_stream(&input_bytes[4]);
 
 		sprintf(output,"%s $%s 0x%08x",OP_NAMES[op.op],OP_REGS[op.first_value],op.second_value);
 
@@ -80,8 +80,8 @@ uint32_t ds_disassemble(uint8_t *input_bytes,uint8_t *output)
 	}
 
 	if(op.first_reg == true && op.second_reg == true){
-		op.first_value = (uint32_t)(*&input_bytes[2]);
-		op.second_value = (uint32_t)(*&input_bytes[6]);
+		op.first_value = u32_from_stream(&input_bytes[2]);
+		op.second_value = u32_from_stream(&input_bytes[6]);
 
 		sprintf(output,"%s 0x%08x 0x%08x",OP_NAMES[op.op],op.first_value,op.second_value);
 
