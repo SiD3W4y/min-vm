@@ -2,7 +2,7 @@ NAME=min
 R2_PLUGIN_PATH=$(shell r2 -hh|grep LIBR_PLUGINS|awk '{print $$2}')
 CFLAGS=-g -fPIC $(shell pkg-config --cflags r_asm) -I ../include
 LDFLAGS=-shared $(shell pkg-config --libs r_asm)
-OBJS=$(NAME).o
+OBJS=$(NAME).o ../src/asm/disas.o ../src/utils/numbers.o
 SO_EXT=$(shell uname|grep -q Darwin && echo dylib || echo so)
 LIB=$(NAME).$(SO_EXT)
 
@@ -14,8 +14,8 @@ all: $(LIB)
 clean:
 	rm -f $(LIB) $(OBJS)
 
-$(LIB): $(ASM_OBJ) $(OBJS)
-	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) $(ASM_OBJ) -o $(LIB)
+$(LIB): $(OBJS)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) -o $(LIB)
 
 ../build/asm/%.o: ../src/asm/%.c ../build/asm
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@

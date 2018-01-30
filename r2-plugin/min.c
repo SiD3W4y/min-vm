@@ -6,6 +6,7 @@
 static int disassemble(RAsm *a,RAsmOp *op,const ut8 *b,int l)
 {
 	op->size = ds_disassemble(b,op->buf_asm);
+	
 	return op->size;
 }
 
