@@ -23,8 +23,10 @@
 #define OP_OR 0x13
 #define OP_SHR 0x14
 #define OP_SHL 0x15
+#define OP_CALL 0x16
+#define OP_RET 0x17
 
-#define OP_MAX_INDEX 0x15
+#define OP_MAX_INDEX 0x17
 
 
 #include <stdbool.h>

@@ -378,9 +378,21 @@ int vm_step(vm_state *st)
 		case OP_POP:
 			VM_ARG_REG(op);
 			
-			memcpy(&st->regs[op.first_value],&st->memory[st->regs[REG_SP]],sizeof(uint32_t));
+			memcpy(&st->regs[op.first_value], &st->memory[st->regs[REG_SP]], sizeof(uint32_t));
 			st->regs[REG_SP] += sizeof(uint32_t);
 
+			break;
+
+		case OP_RET:
+			memcpy(&st->ip, &st->memory[st->regs[REG_SP]], sizeof(uint32_t));
+			st->regs[REG_SP] += sizeof(uint32_t);
+			break;
+
+		case OP_CALL:
+			st->regs[REG_SP] -= sizeof(uint32_t);
+			memcpy(&st->memory[st->regs[REG_SP]], &st->ip, sizeof(uint32_t));
+
+			st->ip = op.first_value;
 			break;
 	}
 
