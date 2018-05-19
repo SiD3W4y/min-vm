@@ -35,7 +35,7 @@ int main(int argc,char **argv)
 
 		vm_load_file(vm,argv[2]);
 //		vm_execute(vm);
-        vm_error err = vm_rework(vm);
+        vm_error err = vm_execute(vm);
 	    
         if(err != VMERR_OK)
             printf("Err\n");

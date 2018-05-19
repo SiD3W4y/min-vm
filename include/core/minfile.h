@@ -14,7 +14,7 @@ typedef struct minfile {
 } minfile;
 
 minfile *minfile_new();
-int32_t minfile_load(minfile *f_st,uint8_t *path); // Error Code
+int32_t minfile_load(minfile *f_st, char *path); // Error Code
 
 
 #endif

@@ -4,7 +4,7 @@
 
 #include "asm/disas.h"
 #include "core/ops.h"
-#include "utils/numbers.h"
+#include "utils/memory.h"
 
 const char* OP_NAMES[] = {"add","sub","mul","mov","ldr","ldrb","str","strb","push","pop","cmp","jmp","jne","je","jle","jbe","sys","xor","and","or","shr","shl", "call", "ret"};
 const char *OP_REGS[] = {"A","B","C","D","E","F","BP","SP"};
@@ -18,7 +18,7 @@ static void parse_cond(vm_opcode *op,unsigned char data)
 
 void ds_print_op(vm_opcode op)
 {
-	char *name = OP_NAMES[op.op];
+	const char *name = OP_NAMES[op.op];
 	if(op.first_reg == true && op.second_reg == true){
 		printf("%s $%s $%s {r,r}\n",name,OP_REGS[op.first_value],OP_REGS[op.second_value]);
 	}
@@ -40,7 +40,7 @@ void ds_print_op(vm_opcode op)
 
 // returns the number of bytes read (processed)
 // TODO : Clean the return value thingy
-uint32_t ds_disassemble(uint8_t *input_bytes,uint8_t *output)
+uint32_t ds_disassemble(char *input_bytes, char *output)
 {
 	vm_opcode op;
 	
@@ -54,8 +54,8 @@ uint32_t ds_disassemble(uint8_t *input_bytes,uint8_t *output)
 	parse_cond(&op,input_bytes[1]);
 	
 	if(op.first_reg == true && op.second_reg == true){
-		op.first_value = u16_from_stream(&input_bytes[2]);
-		op.second_value = u16_from_stream(&input_bytes[4]);
+		op.first_value = MEM_GET_U16(&input_bytes[2]);
+		op.second_value = MEM_GET_U16(&input_bytes[4]);
 
 		switch(op.op){
 			case OP_SYS:
@@ -70,8 +70,8 @@ uint32_t ds_disassemble(uint8_t *input_bytes,uint8_t *output)
 	}
 
 	if(op.first_reg == false && op.second_reg == true){
-		op.first_value = u32_from_stream(&input_bytes[2]);
-		op.second_value = u16_from_stream(&input_bytes[6]);
+		op.first_value = MEM_GET_U32(&input_bytes[2]);
+		op.second_value = MEM_GET_U16(&input_bytes[6]);
 		
 		switch(op.op){
 			case OP_JMP:
@@ -90,8 +90,8 @@ uint32_t ds_disassemble(uint8_t *input_bytes,uint8_t *output)
 	}
 
 	if(op.first_reg == true && op.second_reg == false){
-		op.first_value = u16_from_stream(&input_bytes[2]);
-		op.second_value = u32_from_stream(&input_bytes[4]);
+		op.first_value = MEM_GET_U16(&input_bytes[2]);
+		op.second_value = MEM_GET_U32(&input_bytes[4]);
 
 		sprintf(output,"%s $%s 0x%08x",OP_NAMES[op.op],OP_REGS[op.first_value],op.second_value);
 
@@ -99,8 +99,8 @@ uint32_t ds_disassemble(uint8_t *input_bytes,uint8_t *output)
 	}
 
 	if(op.first_reg == true && op.second_reg == true){
-		op.first_value = u32_from_stream(&input_bytes[2]);
-		op.second_value = u32_from_stream(&input_bytes[6]);
+		op.first_value = MEM_GET_U32(&input_bytes[2]);
+		op.second_value = MEM_GET_U32(&input_bytes[6]);
 
 		sprintf(output,"%s 0x%08x 0x%08x",OP_NAMES[op.op],op.first_value,op.second_value);
 

@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 #include "core/minfile.h"
-#include "utils/numbers.h"
+#include "utils/memory.h"
 
 minfile *minfile_new()
 {
@@ -13,7 +13,7 @@ minfile *minfile_new()
 
 
 // TODO : Add logging when encountering errors
-int32_t minfile_load(minfile *file,uint8_t *path)
+int32_t minfile_load(minfile *file, char *path)
 {
 	FILE *fp;
 	
@@ -44,7 +44,7 @@ int32_t minfile_load(minfile *file,uint8_t *path)
 		return MINFILE_ERROR;
 	}
 	
-	file->entrypoint = u32_from_stream(&file->image[2]);
+	file->entrypoint = MEM_GET_U32(&file->image[2]);
 
 	return MINFILE_SUCCESS;
 }

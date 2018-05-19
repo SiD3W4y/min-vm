@@ -1,11 +1,13 @@
 #ifndef LIST_H
 #define LIST_H
 
-typedef struct node_t {
+typedef struct node_t node;
+
+struct node_t {
 	void *data;
-	struct node *next;
-	struct node *prev;
-}node;
+	node *next;
+	node *prev;
+};
 
 typedef struct list_t {
 	node *head;

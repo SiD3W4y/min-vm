@@ -17,12 +17,12 @@ console *console_new()
 	return c;
 }
 
-void console_setprompt(console *c,uint8_t *new_prompt)
+void console_setprompt(console *c,char *new_prompt)
 {
 	c->prompt = new_prompt;
 }
 
-void console_getline(console *c,uint8_t *buff,uint32_t length)
+void console_getline(console *c, char *buff,uint32_t length)
 {
 	printf("%s ",c->prompt);
 	fgets(buff,length,stdin);
@@ -30,9 +30,9 @@ void console_getline(console *c,uint8_t *buff,uint32_t length)
 
 list *console_tokenize(console *c)
 {
-	uint8_t buff[CONSOLE_LINE_SIZE];
-	uint8_t token[CONSOLE_LINE_SIZE];
-	uint8_t *ptr = &buff;
+	char buff[CONSOLE_LINE_SIZE];
+	char token[CONSOLE_LINE_SIZE];
+	char *ptr = (char *)&buff;
 	uint32_t index = 0;
 
 	// Cleaning our list
