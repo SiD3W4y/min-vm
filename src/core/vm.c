@@ -218,23 +218,22 @@ vm_error vm_execute(vm_state *st)
                     arg0 = st->regs[arg0];
 
                     if(arg0 == arg1) {
-        				st->flags[0] = 1;
-					} else {
-				        st->flags[0] = 0;
-			        }
+                        st->flags[0] = 1;
+                    } else {
+                        st->flags[0] = 0;
+                    }
 
-			        if(arg0 > arg1){
-				        st->flags[1] = 1;
-			        } else {
-				        st->flags[1] = 0;
-			        }
+                    if(arg0 > arg1){
+                        st->flags[1] = 1;
+                    } else {
+                        st->flags[1] = 0;
+                    }
 
-			        if(arg0 < arg1){
-				        st->flags[2] = 1;
-			        } else {
-				        st->flags[2] = 0;
-			        }
-                    
+                    if(arg0 < arg1){
+                        st->flags[2] = 1;
+                    } else {
+                        st->flags[2] = 0;
+                    }
                     break;
                 default:
                     return VMERR_INVALID_REG_INS;
@@ -296,25 +295,23 @@ vm_error vm_execute(vm_state *st)
                     arg1 = st->regs[arg1];
 
                     if(arg0 == arg1) {
-        				st->flags[0] = 1;
-		        	} else {
-				        st->flags[0] = 0;
-			        }
+                        st->flags[0] = 1;
+                    } else {
+                        st->flags[0] = 0;
+                    }
 
-			        if(arg0 > arg1){
-				        st->flags[1] = 1;
-			        } else {
-				        st->flags[1] = 0;
-			        }
+                    if(arg0 > arg1){
+                        st->flags[1] = 1;
+                    } else {
+                        st->flags[1] = 0;
+                    }
 
-			        if(arg0 < arg1){
-				        st->flags[2] = 1;
-			        } else {
-				        st->flags[2] = 0;
-			        }
-                    
+                    if(arg0 < arg1){
+                        st->flags[2] = 1;
+                    } else {
+                        st->flags[2] = 0;
+                    }
                     break;
-
                 case OP_PUSH:
                     st->regs[REG_SP] -= 4;
                     MEM_SET_U32(&st->memory[st->regs[REG_SP]], st->regs[arg0]);
