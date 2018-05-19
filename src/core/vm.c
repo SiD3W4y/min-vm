@@ -14,6 +14,20 @@
 
 #define VM_GET_BYTE(vm) vm->memory[vm->ip++]
 
+// couple of defines usefull to make the code cleaner
+#define OP_IMM_IMM 0x0
+#define OP_REG_IMM 0x1
+#define OP_IMM_REG 0x2
+#define OP_REG_REG 0x3
+
+#define MEM_GET_U32(ptr) *(uint32_t *)ptr
+#define MEM_GET_U16(ptr) *(uint16_t *)ptr
+#define MEM_GET_U8(ptr) *(uint8_t *)ptr
+
+#define MEM_SET_U32(dest, src) *(uint32_t *)dest = (uint32_t)src
+#define MEM_SET_U16(dest, src) *(uint16_t *)dest = (uint16_t)src
+#define MEM_SET_U8(dest, src) *(uint8_t *)dest = (uint8_t)src
+
 // First argument is always a register or value
 #define VM_ARG_REG(op) if(!op.first_reg){\
 	log_error("Wrong argument on op 0x%02x (REG expected)\n",op.op);\
@@ -143,6 +157,247 @@ int vm_execute(vm_state *st)
 		log_error("Execution aborted\n");
 	
 	return status;
+}
+
+vm_error vm_rework(vm_state *st)
+{
+    uint8_t op = 0;
+    uint8_t mode = 0;
+    uint32_t arg0 = 0;
+    uint32_t arg1 = 0;
+    uint8_t asmval[50];
+
+
+    while(st->ip < st->binary_size) {
+    	if(st->debug == 2){
+	    	ds_disassemble(&st->memory[st->ip],(char *)&asmval);
+	    	log_tracing("0x%08x : %s\n",st->ip,asmval);
+	    }
+
+        
+        op = MEM_GET_U8(&st->memory[st->ip++]);
+
+        if(op > OP_MAX_INDEX)
+            return VMERR_INVALID_INS;
+
+        mode = MEM_GET_U8(&st->memory[st->ip++]);
+
+        if(mode == OP_REG_IMM) {
+            // handling <op> <reg> <imm>
+            arg0 = MEM_GET_U16(&st->memory[st->ip]);
+            st->ip += 2;
+
+            arg1 = MEM_GET_U32(&st->memory[st->ip]);
+            st->ip += 4;
+
+            if(arg0 >= VM_REG_COUNT)
+                return VMERR_INVALID_REG;
+
+            switch(op) {
+                case OP_MOV:
+                    st->regs[arg0] = arg1;
+                    break;
+                case OP_LDR:
+                    st->regs[arg0] = MEM_GET_U32(&st->memory[arg1]);
+                    break;
+                case OP_LDRB:
+                    st->regs[arg0] = MEM_GET_U8(&st->memory[arg1]);
+                    break;
+                case OP_STR:
+                    MEM_SET_U32(&st->memory[arg1], st->regs[arg0]);
+                    break;
+                case OP_STRB:
+                    MEM_SET_U8(&st->memory[arg1], st->regs[arg0]);
+                    break;
+                case OP_ADD:
+                    st->regs[arg0] += arg1;
+                    break;
+                case OP_SUB:
+                    st->regs[arg0] -= arg1;
+                    break;
+                case OP_MUL:
+                    st->regs[arg0] *= arg1;
+                    break;
+                case OP_XOR:
+                    st->regs[arg0] ^= arg1;
+                    break;
+                case OP_OR:
+                    st->regs[arg0] |= arg1;
+                    break;
+                case OP_AND:
+                    st->regs[arg0] &= arg1;
+                    break;
+                case OP_SHR:
+                    st->regs[arg0] = st->regs[arg0] >> arg1;
+                    break;
+                case OP_SHL:
+                    st->regs[arg0] = st->regs[arg0] << arg1;
+                    break;
+                case OP_CMP:
+                    arg0 = st->regs[arg0];
+
+                    if(arg0 == arg1) {
+        				st->flags[0] = 1;
+		        	} else {
+				        st->flags[0] = 0;
+			        }
+
+			        if(arg0 > arg1){
+				        st->flags[1] = 1;
+			        } else {
+				        st->flags[1] = 0;
+			        }
+
+			        if(arg0 < arg1){
+				        st->flags[2] = 1;
+			        } else {
+				        st->flags[2] = 0;
+			        }
+                    
+                    break;
+                default:
+                    return VMERR_INVALID_REG_INS;
+            }
+
+        } else if(mode == OP_REG_REG) {
+            // handling <op> <reg> <reg>
+            arg0 = MEM_GET_U16(&st->memory[st->ip]);
+            st->ip += 2;
+
+            arg1 = MEM_GET_U16(&st->memory[st->ip]);
+            st->ip += 2;
+
+            if(arg0 >= VM_REG_COUNT || arg1 >= VM_REG_COUNT)
+                return VMERR_INVALID_REG;
+
+            switch(op) {
+                case OP_MOV:
+                    st->regs[arg0] = st->regs[arg1];
+                    break;
+                case OP_LDR:
+                    st->regs[arg0] = MEM_GET_U32(&st->memory[st->regs[arg1]]);
+                    break;
+                case OP_LDRB:
+                    st->regs[arg0] = MEM_GET_U8(&st->memory[st->regs[arg1]]);
+                    break;
+                case OP_STR:
+                    MEM_SET_U32(&st->memory[st->regs[arg1]], st->regs[arg0]);
+                    break;
+                case OP_STRB:
+                    MEM_SET_U8(&st->memory[st->regs[arg1]], st->regs[arg0]);
+                    break;
+                case OP_ADD:
+                    st->regs[arg0] += st->regs[arg1];
+                    break;
+                case OP_SUB:
+                    st->regs[arg0] -= st->regs[arg1];
+                    break;
+                case OP_MUL:
+                    st->regs[arg0] *= st->regs[arg1];
+                    break;
+                case OP_XOR:
+                    st->regs[arg0] ^= st->regs[arg1];
+                    break;
+                case OP_OR:
+                    st->regs[arg0] |= st->regs[arg1];
+                    break;
+                case OP_AND:
+                    st->regs[arg0] &= st->regs[arg1];
+                    break;
+                case OP_SHR:
+                    st->regs[arg0] = st->regs[arg0] >> st->regs[arg1];
+                    break;
+                case OP_SHL:
+                    st->regs[arg0] = st->regs[arg0] << st->regs[arg1];
+                    break;
+                case OP_CMP:
+                    arg0 = st->regs[arg0];
+                    arg1 = st->regs[arg1];
+
+                    if(arg0 == arg1) {
+        				st->flags[0] = 1;
+		        	} else {
+				        st->flags[0] = 0;
+			        }
+
+			        if(arg0 > arg1){
+				        st->flags[1] = 1;
+			        } else {
+				        st->flags[1] = 0;
+			        }
+
+			        if(arg0 < arg1){
+				        st->flags[2] = 1;
+			        } else {
+				        st->flags[2] = 0;
+			        }
+                    
+                    break;
+
+                case OP_PUSH:
+                    st->regs[REG_SP] -= 4;
+                    MEM_SET_U32(&st->memory[st->regs[REG_SP]], st->regs[arg0]);
+                    break;
+                case OP_POP:
+                    st->regs[arg0] = MEM_GET_U32(&st->memory[st->regs[REG_SP]]);
+                    st->regs[REG_SP] += 4;
+                    break;
+                case OP_RET:
+                    st->ip = MEM_GET_U32(&st->memory[st->regs[REG_SP]]);
+                    st->regs[REG_SP] += 4;
+                    break;
+                case OP_SYS:
+                    vm_syscall(st,st->regs[0]);
+                    break;
+                default:
+                    return VMERR_INVALID_REG_INS;
+            }
+
+        } else if(mode == OP_IMM_REG) {
+            // handling <op> <imm> <reg>
+            arg0 = MEM_GET_U32(&st->memory[st->ip]); 
+            st->ip += 4;
+
+            arg1 = MEM_GET_U16(&st->memory[st->ip]);
+            st->ip += 2;
+
+            switch(op) {
+                case OP_JMP:
+                    st->ip = arg0;
+                    break;
+                case OP_JNE:
+                    if(st->flags[0] == 0)
+                        st->ip = arg0;
+                    break;
+                case OP_JE:
+                    if(st->flags[0] == 1)
+                        st->ip = arg0;
+                    break;
+                case OP_JLE:
+                    if(st->flags[2] == 1)
+                        st->ip = arg0;
+                    break;
+                case OP_JBE:
+                    if(st->flags[1] == 1)
+                        st->ip = arg0;
+                    break;
+                case OP_CALL:
+                    st->regs[REG_SP] -= 4;
+                    MEM_SET_U32(&st->memory[st->regs[REG_SP]], st->ip);
+                    st->ip = arg0; 
+                    break;
+                default:
+                    return VMERR_INVALID_REG_INS;
+            }
+
+        } else {
+            // <op> <imm> <imm>
+            // These are not valid argument combination
+            return VMERR_ARG_COMB;
+        }
+    }
+
+    return VMERR_OK;
 }
 
 // Executes only one instruction
@@ -373,13 +628,15 @@ int vm_step(vm_state *st)
 			
 			st->regs[REG_SP] -= sizeof(uint32_t);
 			memcpy(&st->memory[st->regs[REG_SP]],&st->regs[op.first_value],sizeof(uint32_t));
-			
+            printf("PUSH OLD : %u\n", st->regs[op.first_value]);
+
 			break;
 		case OP_POP:
 			VM_ARG_REG(op);
 			
 			memcpy(&st->regs[op.first_value], &st->memory[st->regs[REG_SP]], sizeof(uint32_t));
 			st->regs[REG_SP] += sizeof(uint32_t);
+            printf("POP OLD : %u\n", st->regs[op.first_value]);
 
 			break;
 

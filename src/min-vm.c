@@ -34,8 +34,12 @@ int main(int argc,char **argv)
 
 
 		vm_load_file(vm,argv[2]);
-		vm_execute(vm);
-	}else{
+//		vm_execute(vm);
+        vm_error err = vm_rework(vm);
+	    
+        if(err != VMERR_OK)
+            printf("Err\n");
+    }else{
 		printf("%s : Not a valid flag !\n",mode);
 		return -1;
 	}
