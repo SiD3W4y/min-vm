@@ -58,10 +58,6 @@ uint32_t ds_disassemble(uint8_t *input_bytes,uint8_t *output)
 		op.second_value = u16_from_stream(&input_bytes[4]);
 
 		switch(op.op){
-			case OP_PUSH:
-			case OP_POP:
-				sprintf(output,"%s $%s",OP_NAMES[op.op],OP_REGS[op.first_value]);
-				break;
 			case OP_SYS:
 				sprintf(output,"%s",OP_NAMES[op.op]);
 				break;
