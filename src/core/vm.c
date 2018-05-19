@@ -90,6 +90,30 @@ char *vm_error_tostr(vm_error err)
 	return "Why are you here ?";
 }
 
+void vm_stacktrace(vm_state *st)
+{
+	int i = 0;
+	int cnt = st->ip;
+	int off = 0;
+	char asmval[50];
+
+	printf("============ Stacktrace ============\n");
+
+	for(i = 0;i < 15; i++) {
+		if(cnt < st->binary_size){
+			off += ds_disassemble((char *)&st->memory[cnt], (char *)&asmval);
+			printf("0x%08x : %s\n", cnt, asmval);
+			cnt += off;
+		}
+	}
+
+	printf("============ Register status ============\n");
+	
+	for(i = 0; i < VM_REG_COUNT; i++) {
+		printf("%s = 0x%08x\n", OP_REGS[i], st->regs[i]);
+	}
+}
+
 int vm_syscall(vm_state *st,int syscall)
 {
 	switch(syscall){

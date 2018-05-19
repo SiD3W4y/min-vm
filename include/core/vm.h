@@ -36,5 +36,6 @@ int vm_load_file(vm_state *st,char *path);
 vm_error vm_execute(vm_state *st);
 int vm_syscall(vm_state *st,int syscall);
 char *vm_error_tostr(vm_error err);
+void vm_stacktrace(vm_state *st);
 
 #endif

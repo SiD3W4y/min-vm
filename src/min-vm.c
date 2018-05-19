@@ -37,8 +37,10 @@ int main(int argc,char **argv)
 //		vm_execute(vm);
         vm_error err = vm_execute(vm);
 	    
-        if(err != VMERR_OK)
-            printf("Err\n");
+        if(err != VMERR_OK) {
+            printf("Execution error : %s\n", vm_error_tostr(err));
+			vm_stacktrace(vm);
+		}
     }else{
 		printf("%s : Not a valid flag !\n",mode);
 		return -1;
