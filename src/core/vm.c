@@ -74,70 +74,69 @@ void vm_free(vm_state *st)
 
 char *vm_error_tostr(vm_error err)
 {
-	switch(err){
-		case VMERR_OK:
-			return "No Error";
-		case VMERR_INVALID_INS:
-			return "Invalid instruction";
-		case VMERR_INVALID_REG:
-			return "Invalid register index";
-		case VMERR_INVALID_REG_INS:
-			return "Invalid register/immediate combination for instruction";
-		case VMERR_ARG_COMB:
-			return "Impossible argument combination";
-	}
+    switch(err){
+        case VMERR_OK:
+            return "No Error";
+        case VMERR_INVALID_INS:
+            return "Invalid instruction";
+        case VMERR_INVALID_REG:
+            return "Invalid register index";
+        case VMERR_INVALID_REG_INS:
+            return "Invalid register/immediate combination for instruction";
+        case VMERR_ARG_COMB:
+            return "Impossible argument combination";
+    }
 
-	return "Why are you here ?";
+    return "Why are you here ?";
 }
 
 void vm_stacktrace(vm_state *st)
 {
-	int i = 0;
-	int cnt = st->ip;
-	int off = 0;
-	char asmval[50];
+    int i = 0;
+    int cnt = st->ip;
+    int off = 0;
+    char asmval[50];
 
-	printf("============ Stacktrace ============\n");
+    printf("============ Stacktrace ============\n");
 
-	for(i = 0;i < 15; i++) {
-		if(cnt < st->binary_size){
-			off += ds_disassemble((char *)&st->memory[cnt], (char *)&asmval);
-			printf("0x%08x : %s\n", cnt, asmval);
-			cnt += off;
-		}
-	}
+    for(i = 0;i < 15; i++) {
+        if(cnt < st->binary_size){
+            off += ds_disassemble((char *)&st->memory[cnt], (char *)&asmval);
+            printf("0x%08x : %s\n", cnt, asmval);
+            cnt += off;
+        }
+    }
 
-	printf("============ Register status ============\n");
+    printf("============ Register status ============\n");
 	
-	for(i = 0; i < VM_REG_COUNT; i++) {
-		printf("%s = 0x%08x\n", OP_REGS[i], st->regs[i]);
-	}
+    for(i = 0; i < VM_REG_COUNT; i++) {
+        printf("%s = 0x%08x\n", OP_REGS[i], st->regs[i]);
+    }
 }
 
 int vm_syscall(vm_state *st,int syscall)
 {
-	switch(syscall){
-		case SYS_WRITE:
-			if(st->debug > 0){
-				log_syscall("write(fd -> %d, addr -> 0x%08x, size -> %d)\n",st->regs[1],st->regs[2],st->regs[3]);
-			}
-			write(st->regs[1],&st->memory[st->regs[2]],st->regs[3]);
-			break;
-		case SYS_READ:
-			if(st->debug > 0){
-				log_syscall("read(fd -> %d, addr -> 0x%08x, size -> %d)\n",st->regs[1],st->regs[2],st->regs[3]);
-			}
-			read(st->regs[1],&st->memory[st->regs[2]],st->regs[3]);
-			break;
-			
-		case SYS_EXIT:
-			if(st->debug > 0){
-				log_syscall("exit(code -> %d)\n",st->regs[1]);
-			}
-			exit(st->regs[2]);
-	}
-
-	return 0;
+    switch(syscall){
+        case SYS_WRITE:
+            if(st->debug > 0){
+                log_syscall("write(fd -> %d, addr -> 0x%08x, size -> %d)\n",st->regs[1],st->regs[2],st->regs[3]);
+            }
+            write(st->regs[1],&st->memory[st->regs[2]],st->regs[3]);
+            break;
+        case SYS_READ:
+            if(st->debug > 0){
+                log_syscall("read(fd -> %d, addr -> 0x%08x, size -> %d)\n",st->regs[1],st->regs[2],st->regs[3]);
+            }
+            read(st->regs[1],&st->memory[st->regs[2]],st->regs[3]);
+            break;
+        case SYS_EXIT:
+            if(st->debug > 0){
+                log_syscall("exit(code -> %d)\n",st->regs[1]);
+            }
+            exit(st->regs[2]);
+    }
+    
+    return 0;
 }
 
 vm_error vm_execute(vm_state *st)
