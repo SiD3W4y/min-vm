@@ -6,9 +6,9 @@
 #define CONSOLE_LINE_SIZE 256
 
 typedef struct console {
-	list *tokens;
-	char line[CONSOLE_LINE_SIZE];
-	char *prompt;
+    list *tokens;
+    char line[CONSOLE_LINE_SIZE];
+    char *prompt;
 }console;
 
 console *console_new();

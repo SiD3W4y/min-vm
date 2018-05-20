@@ -4,14 +4,14 @@
 typedef struct node_t node;
 
 struct node_t {
-	void *data;
-	node *next;
-	node *prev;
+    void *data;
+    node *next;
+    node *prev;
 };
 
 typedef struct list_t {
-	node *head;
-	node *tail;
+    node *head;
+    node *tail;
 }list;
 
 node *node_new(void *data);

@@ -19,15 +19,15 @@ typedef enum vm_error_t {
 } vm_error;
 
 typedef struct st_vm_state{
-	int regs[VM_REG_COUNT]; // A B C D E F BP SP
-	int ip;
-	unsigned char flags[VM_FLAG_COUNT]; // Z H L
-	unsigned char *memory;
+    int regs[VM_REG_COUNT]; // A B C D E F BP SP
+    int ip;
+    unsigned char flags[VM_FLAG_COUNT]; // Z H L
+    unsigned char *memory;
 
-	int binary_size;
-	int entrypoint;
-	int total_size;
-	int debug; // Flag indicating if we are running in tracing (2), simple debug (1) or nothing (0) mode
+    int binary_size;
+    int entrypoint;
+    int total_size;
+    int debug; // Flag indicating if we are running in tracing (2), simple debug (1) or nothing (0) mode
 }vm_state;
 
 vm_state *vm_new();

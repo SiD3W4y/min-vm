@@ -33,11 +33,11 @@
 #include <stdint.h>
 
 typedef struct vm_opcode{
-	uint8_t op;
-	bool first_reg;
-	bool second_reg;
-	uint32_t first_value;
-	uint32_t second_value;
+    uint8_t op;
+    bool first_reg;
+    bool second_reg;
+    uint32_t first_value;
+    uint32_t second_value;
 }vm_opcode;
 
 

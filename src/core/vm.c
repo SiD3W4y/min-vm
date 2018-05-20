@@ -20,56 +20,56 @@
 
 int vm_load_file(vm_state *st,char *path)
 {
-	minfile *binary = minfile_new();
-	if(minfile_load(binary,path) < 0){
-		log_error("There was an error processing the file");
-		return -1;
-	}
+    minfile *binary = minfile_new();
+    if(minfile_load(binary,path) < 0){
+        log_error("There was an error processing the file");
+        return -1;
+    }
 
-	st->entrypoint = binary->entrypoint;
-	st->binary_size = binary->size;
-	st->total_size = binary->size; // This is just useless
-	st->memory = binary->image;
+    st->entrypoint = binary->entrypoint;
+    st->binary_size = binary->size;
+    st->total_size = binary->size; // This is just useless
+    st->memory = binary->image;
 
-	st->ip = st->entrypoint;
+    st->ip = st->entrypoint;
 
-	if(st->debug > 0){
-		log_info("Binary entry point : 0x%08x\n",st->entrypoint);
-	}
-	return 0;
+    if(st->debug > 0){
+        log_info("Binary entry point : 0x%08x\n",st->entrypoint);
+    }
+    return 0;
 }
 
 vm_state *vm_new()
 {
-	int i = 0;
-	vm_state *st = malloc(sizeof(vm_state));
+    int i = 0;
+    vm_state *st = malloc(sizeof(vm_state));
 	
-	// We init the regs
-	for(i = 0;i < VM_REG_COUNT;i++){
-		st->regs[i] = 0;
-	}
+    // We init the regs
+    for(i = 0;i < VM_REG_COUNT;i++){
+        st->regs[i] = 0;
+    }
 
-	// And the flags
-	for(i = 0;i < VM_FLAG_COUNT;i++){
-		st->flags[i] = 0;
-	}
+    // And the flags
+    for(i = 0;i < VM_FLAG_COUNT;i++){
+        st->flags[i] = 0;
+    }
 	
-	st->debug = 0;
+    st->debug = 0;
 	
-	st->ip = 0;
-	st->regs[VM_REG_COUNT-1] = VM_MEMORY; // SP
-	st->regs[VM_REG_COUNT-2] = 0; // BP
+    st->ip = 0;
+    st->regs[VM_REG_COUNT-1] = VM_MEMORY; // SP
+    st->regs[VM_REG_COUNT-2] = 0; // BP
 	
-	st->memory = malloc(VM_MEMORY);
-	memset(st->memory,0,VM_MEMORY);
+    st->memory = malloc(VM_MEMORY);
+    memset(st->memory,0,VM_MEMORY);
 
-	return st;
+    return st;
 }
 
 void vm_free(vm_state *st)
 {
-	free(st->memory);
-	free(st);
+    free(st->memory);
+    free(st);
 }
 
 char *vm_error_tostr(vm_error err)
@@ -135,7 +135,7 @@ int vm_syscall(vm_state *st,int syscall)
             }
             exit(st->regs[2]);
     }
-    
+
     return 0;
 }
 

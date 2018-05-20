@@ -8,9 +8,9 @@
 #include <stdint.h>
 
 typedef struct minfile {
-	uint8_t *image;
-	uint32_t size;
-	uint32_t entrypoint;
+    uint8_t *image;
+    uint32_t size;
+    uint32_t entrypoint;
 } minfile;
 
 minfile *minfile_new();
