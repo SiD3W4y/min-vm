@@ -39,6 +39,21 @@ int vm_load_file(vm_state *st,char *path)
     return 0;
 }
 
+int vm_load_mem(vm_state *st, unsigned char *buff, int size)
+{
+    st->entrypoint = MEM_GET_U32(buff[2]);
+    st->binary_size = size;
+    st->total_size = size; // This is just useless
+    st->memory = buff;
+
+    st->ip = st->entrypoint;
+
+    if(st->debug > 0){
+        log_info("Binary entry point : 0x%08x\n",st->entrypoint);
+    }
+    return 0;
+}
+
 vm_state *vm_new()
 {
     int i = 0;
