@@ -40,7 +40,7 @@ int32_t minfile_load(minfile *file, char *path)
     fread(file->image,file->size,1,fp);
     fclose(fp);
     
-    if(file->image[0] != 'M' && file->image[0] != 'X'){
+    if(file->image[0] != 'M' && file->image[1] != 'X'){
         return MINFILE_ERROR;
     }
     
