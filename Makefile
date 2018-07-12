@@ -1,45 +1,43 @@
 CFLAGS=-Wall -fPIC
-INCLUDES= -I include
+INCLUDES=-I include
 
 CORE_SRC=$(wildcard src/core/*.c)
 ASM_SRC=$(wildcard src/asm/*.c)
 UTILS_SRC=$(wildcard src/utils/*.c)
 
-CORE_OBJ=$(patsubst src/core/%.c,build/core/%.o,$(CORE_SRC))
-ASM_OBJ=$(patsubst src/asm/%.c,build/asm/%.o,$(ASM_SRC))
-UTILS_OBJ=$(patsubst src/utils/%.c,build/utils/%.o,$(UTILS_SRC))
+CORE_OBJ=$(patsubst src/core/%.c,src/core/%.o,$(CORE_SRC))
+ASM_OBJ=$(patsubst src/asm/%.c,src/asm/%.o,$(ASM_SRC))
+UTILS_OBJ=$(patsubst src/utils/%.c,src/utils/%.o,$(UTILS_SRC))
 
-min-vm: $(ASM_OBJ) $(CORE_OBJ) $(UTILS_OBJ) build/min-vm.o
-	$(CC) $(ASM_OBJ) $(CORE_OBJ) $(UTILS_OBJ) build/min-vm.o -o min-vm
+all: libminvm.so min-vm
 
-min-ds: $(ASM_OBJ) $(CORE_OBJ) $(UTILS_OBJ) build/min-ds.o
-	$(CC) $(ASM_OBJ) $(CORE_OBJ) $(UTILS_OBJ) build/min-ds.o -o min-ds
+libminvm.a: $(ASM_OBJ) $(CORE_OBJ) $(UTILS_OBJ)
+	ar cr $@ $^
 
-build/min-vm.o: src/min-vm.c
+libminvm.so: libminvm.a
+	$(CC) $< -shared -o $@
+
+min-vm: src/min-vm.o libminvm.a
+	$(CC) $^ -o $@
+
+src/min-vm.o: src/min-vm.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
-build/min-ds.o: src/min-ds.c
+src/core/%.o: src/core/%.c	
+	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
+
+src/asm/%.o: src/asm/%.c 
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
 
-build/core/%.o: src/core/%.c build/core
+src/utils/%.o: src/utils/%.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
-
-build/asm/%.o: src/asm/%.c build/asm
-	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
-
-
-build/utils/%.o: src/utils/%.c build/utils
-	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
-
-build/core:
-	@mkdir -p build/core
-
-build/asm:
-	@mkdir -p build/asm
-
-build/utils:
-	@mkdir -p build/utils
 
 clean:
-	rm -rf build
+	rm -rf $(ASM_OBJ)
+	rm -rf $(UTILS_OBJ)
+	rm -rf $(CORE_OBJ)
+	rm -rf src/*.o
+	rm -rf libminvm.a
+	rm -rf libminvm.so
+	rm -rf min-vm
