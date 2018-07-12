@@ -33,7 +33,7 @@ typedef struct st_vm_state{
 vm_state *vm_new();
 void vm_free(vm_state *st);
 int vm_load_file(vm_state *st,char *path);
-int vm_load_mem(vm_state *st, unsigned char *buff, int size)
+int vm_load_mem(vm_state *st, unsigned char *buff, int size);
 vm_error vm_execute(vm_state *st);
 int vm_syscall(vm_state *st,int syscall);
 char *vm_error_tostr(vm_error err);

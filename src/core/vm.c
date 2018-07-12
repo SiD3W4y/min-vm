@@ -41,7 +41,7 @@ int vm_load_file(vm_state *st,char *path)
 
 int vm_load_mem(vm_state *st, unsigned char *buff, int size)
 {
-    st->entrypoint = MEM_GET_U32(buff[2]);
+    st->entrypoint = MEM_GET_U32(&buff[2]);
     st->binary_size = size;
     st->total_size = size; // This is just useless
     st->memory = buff;
