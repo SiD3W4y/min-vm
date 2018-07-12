@@ -14,8 +14,8 @@ all: libminvm.so min-vm
 libminvm.a: $(ASM_OBJ) $(CORE_OBJ) $(UTILS_OBJ)
 	ar cr $@ $^
 
-libminvm.so: libminvm.a
-	$(CC) $< -shared -o $@
+libminvm.so: $(ASM_OBJ) $(CORE_OBJ) $(UTILS_OBJ)
+	$(CC) $^ -shared -o $@
 
 min-vm: src/min-vm.o libminvm.a
 	$(CC) $^ -o $@
