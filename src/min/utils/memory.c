@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "utils/memory.h"
+#include "min/utils/memory.h"
 
 uint32_t num_tou32(char *str)
 {	

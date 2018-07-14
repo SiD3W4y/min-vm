@@ -2,9 +2,9 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "asm/disas.h"
-#include "core/ops.h"
-#include "utils/memory.h"
+#include "min/asm/disas.h"
+#include "min/core/ops.h"
+#include "min/utils/memory.h"
 
 const char* OP_NAMES[] = {"add","sub","mul","mov","ldr","ldrb","str","strb","push","pop","cmp","jmp","jne","je","jle","jbe","sys","xor","and","or","shr","shl", "call", "ret"};
 const char *OP_REGS[] = {"A","B","C","D","E","F","BP","SP"};

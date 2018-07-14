@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#include "utils/list.h"
+#include "min/utils/list.h"
 
 node *node_new(void *data)
 {

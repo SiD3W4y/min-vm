@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "core/minfile.h"
-#include "utils/memory.h"
+#include "min/core/minfile.h"
+#include "min/utils/memory.h"
 
 minfile *minfile_new()
 {

@@ -4,13 +4,13 @@
 #include <string.h>
 #include <stdbool.h>
 
-#include "core/vm.h"
-#include "core/ops.h"
-#include "core/syscall.h"
-#include "core/minfile.h"
-#include "asm/disas.h"
-#include "utils/log.h"
-#include "utils/memory.h"
+#include "min/core/vm.h"
+#include "min/core/ops.h"
+#include "min/core/syscall.h"
+#include "min/core/minfile.h"
+#include "min/asm/disas.h"
+#include "min/utils/log.h"
+#include "min/utils/memory.h"
 
 // couple of defines usefull to make the code cleaner
 #define OP_IMM_IMM 0x0
