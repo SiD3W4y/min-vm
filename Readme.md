@@ -45,20 +45,15 @@ If you want for whatever reason to compile some min assembly, you can use the co
 
 
 ## Disassembly
-It is possible to disassemble min bytecode using the radare2 plugin in r2-plugin folder or use the project's
-own disassembler.
+You can use the disassembler plugin in the r2-plugin folder to disassemble min bytecode with radare2.
+To being able to build it you must first compile the min-vm project. Then build and install the plugin using
+the following commands.
 
-
-For an unknown reason the r2 plugin builds but radare does not find the plugin, so use the built-in disassembler for now.
-### Install r2 plugin
 ```
 $ cd r2-plugin/
 $ make
 $ make install
-<use "e asm.arch = min" in r2>
+# use "e asm.arch = min" in r2 or launch r2 with "r2 -a min <file.mx>"
 ```
 
-### Compile toy disassembler
-```
-$ make min-ds
-```
+Code analysis and binary loading plugins are not implemented for now but will be in the future.
