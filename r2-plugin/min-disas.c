@@ -1,7 +1,7 @@
 #include <r_asm.h>
 #include <r_lib.h>
 
-#include "asm/disas.h"
+#include "min/asm/disas.h"
 
 static int disassemble(RAsm *a,RAsmOp *op,const ut8 *b,int l)
 {
