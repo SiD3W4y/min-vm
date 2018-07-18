@@ -8,11 +8,14 @@ SO_EXT=$(shell uname|grep -q Darwin && echo dylib || echo so)
 ASM_SRC=$(wildcard ../src/asm/*.c)
 ASM_OBJ=$(patsubst ../src/asm/%.c,../build/asm/%.o,$(ASM_SRC))
 
-LIBS=min-disas.$(SO_EXT)
+LIBS=min-disas.$(SO_EXT) min-anal.$(SO_EXT)
 
 all: $(LIBS)
 
 min-disas.$(SO_EXT): min-disas.o
+	$(CC) $(LDFLAGS) $^ ../libminvm.a -shared -o $@
+
+min-anal.$(SO_EXT): min-anal.o
 	$(CC) $(LDFLAGS) $^ ../libminvm.a -shared -o $@
 
 clean:
