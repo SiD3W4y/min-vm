@@ -26,4 +26,4 @@ install:
 	cp -f *.$(SO_EXT) $(R2_PLUGIN_PATH)/
 
 uninstall:
-	rm -f $(R2_PLUGIN_PATH)/$(NAME).$(SO_EXT)
+	rm -f $(R2_PLUGIN_PATH)/$(NAME)-*.$(SO_EXT)

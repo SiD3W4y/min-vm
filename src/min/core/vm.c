@@ -116,7 +116,7 @@ void vm_stacktrace(vm_state *st)
 
     for(i = 0;i < 15; i++) {
         if(cnt < st->binary_size){
-            off += ds_disassemble((char *)&st->memory[cnt], (char *)&asmval);
+            off += asm_disassemble((char *)&st->memory[cnt], (char *)&asmval);
             printf("0x%08x : %s\n", cnt, asmval);
             cnt += off;
         }
@@ -165,7 +165,7 @@ vm_error vm_execute(vm_state *st)
 
     while(st->ip < st->binary_size) {
     	if(st->debug == 2){
-	    	ds_disassemble((char *)&st->memory[st->ip], (char *)&asmval);
+	    	asm_disassemble((char *)&st->memory[st->ip], (char *)&asmval);
 	    	log_tracing("0x%08x : %s\n",st->ip,asmval);
 	    }
 

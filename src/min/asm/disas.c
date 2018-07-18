@@ -6,7 +6,7 @@
 #include "min/core/ops.h"
 #include "min/utils/memory.h"
 
-const char* OP_NAMES[] = {"add","sub","mul","mov","ldr","ldrb","str","strb","push","pop","cmp","jmp","jne","je","jle","jbe","sys","xor","and","or","shr","shl", "call", "ret"};
+const char *OP_NAMES[] = {"add","sub","mul","mov","ldr","ldrb","str","strb","push","pop","cmp","jmp","jne","je","jle","jbe","sys","xor","and","or","shr","shl", "call", "ret"};
 const char *OP_REGS[] = {"A","B","C","D","E","F","BP","SP"};
 
 static void parse_cond(vm_opcode *op,unsigned char data)
@@ -16,7 +16,7 @@ static void parse_cond(vm_opcode *op,unsigned char data)
 }
 
 
-void ds_print_op(vm_opcode op)
+void asm_print_op(vm_opcode op)
 {
     const char *name = OP_NAMES[op.op];
     if(op.first_reg == true && op.second_reg == true){
@@ -40,22 +40,25 @@ void ds_print_op(vm_opcode op)
 
 // returns the number of bytes read (processed)
 // TODO : Clean the return value thingy
-uint32_t ds_disassemble(char *input_bytes, char *output)
+uint32_t asm_disassemble(char *input_bytes, char *output)
 {
     vm_opcode op;
+    int ops_count = sizeof(OP_REGS) / sizeof(char *);
     
     op.op = input_bytes[0];
 
-    if(op.op > OP_MAX_INDEX){
-        sprintf(output,"invalid");
-        return 1;
-    }
+    if(op.op > OP_MAX_INDEX)
+        goto invalid;
     
     parse_cond(&op,input_bytes[1]);
-    
+
+
     if(op.first_reg == true && op.second_reg == true){
         op.first_value = MEM_GET_U16(&input_bytes[2]);
         op.second_value = MEM_GET_U16(&input_bytes[4]);
+
+        if(op.first_value >= ops_count || op.second_value >= ops_count)
+            goto invalid;
 
         switch(op.op){
             case OP_SYS:
@@ -82,6 +85,9 @@ uint32_t ds_disassemble(char *input_bytes, char *output)
                 sprintf(output,"%s 0x%08x",OP_NAMES[op.op],op.first_value);
                 break;
             default:
+                if(op.second_value >= ops_count)
+                    goto invalid;
+
                 sprintf(output,"%s 0x%08x $%s",OP_NAMES[op.op],op.first_value,OP_REGS[op.second_value]);
                 break;
         }
@@ -92,13 +98,16 @@ uint32_t ds_disassemble(char *input_bytes, char *output)
     if(op.first_reg == true && op.second_reg == false){
         op.first_value = MEM_GET_U16(&input_bytes[2]);
         op.second_value = MEM_GET_U32(&input_bytes[4]);
+        
+        if(op.first_value >= ops_count)
+            goto invalid;
 
         sprintf(output,"%s $%s 0x%08x",OP_NAMES[op.op],OP_REGS[op.first_value],op.second_value);
 
         return 8;
     }
 
-    if(op.first_reg == true && op.second_reg == true){
+    if(op.first_reg == false && op.second_reg == false){
         op.first_value = MEM_GET_U32(&input_bytes[2]);
         op.second_value = MEM_GET_U32(&input_bytes[6]);
 
@@ -107,6 +116,8 @@ uint32_t ds_disassemble(char *input_bytes, char *output)
         return 10;
     }
 
+invalid:
+    sprintf(output, "invalid");
     return 1;
 }
 

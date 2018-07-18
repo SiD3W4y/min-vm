@@ -1,4 +1,4 @@
-CFLAGS=-Wall -fPIC
+CFLAGS=-g -Wall -fPIC
 INCLUDES=-I include
 
 CORE_SRC=$(wildcard src/min/core/*.c)
