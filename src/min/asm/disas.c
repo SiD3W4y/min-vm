@@ -57,6 +57,11 @@ uint32_t ds_disassemble(char *input_bytes, char *output)
         op.first_value = MEM_GET_U16(&input_bytes[2]);
         op.second_value = MEM_GET_U16(&input_bytes[4]);
 
+        if(op.first_value > OP_MAX_INDEX || op.second_value > OP_MAX_INDEX) {
+            sprintf(output, "invalid");
+            return 1;
+        }
+
         switch(op.op){
             case OP_SYS:
                 sprintf(output,"%s",OP_NAMES[op.op]);
@@ -72,6 +77,12 @@ uint32_t ds_disassemble(char *input_bytes, char *output)
     if(op.first_reg == false && op.second_reg == true){
         op.first_value = MEM_GET_U32(&input_bytes[2]);
         op.second_value = MEM_GET_U16(&input_bytes[6]);
+
+
+        if(op.second_value > OP_MAX_INDEX) {
+            sprintf(output, "invalid");
+            return 1;
+        }
         
         switch(op.op){
             case OP_JMP:
@@ -92,6 +103,11 @@ uint32_t ds_disassemble(char *input_bytes, char *output)
     if(op.first_reg == true && op.second_reg == false){
         op.first_value = MEM_GET_U16(&input_bytes[2]);
         op.second_value = MEM_GET_U32(&input_bytes[4]);
+
+        if(op.first_value > OP_MAX_INDEX) {
+            sprintf(output, "invalid");
+            return 1;
+        }
 
         sprintf(output,"%s $%s 0x%08x",OP_NAMES[op.op],OP_REGS[op.first_value],op.second_value);
 

@@ -15,12 +15,14 @@ typedef enum vm_error_t {
     VMERR_ARG_COMB,
     VMERR_INVALID_INS, // invalid opcode
     VMERR_INVALID_REG, // invalid register value
-    VMERR_INVALID_REG_INS // invalid argument combination for instruction
+    VMERR_INVALID_REG_INS, // invalid argument combination for instruction
+    VMERR_INVALID_OOB_IP, // instruction pointer out of bounds
+    VMERR_INVALID_MEM 
 } vm_error;
 
 typedef struct st_vm_state{
     int regs[VM_REG_COUNT]; // A B C D E F BP SP
-    int ip;
+    unsigned int ip;
     unsigned char flags[VM_FLAG_COUNT]; // Z H L
     unsigned char *memory;
 

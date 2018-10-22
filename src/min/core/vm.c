@@ -100,6 +100,10 @@ char *vm_error_tostr(vm_error err)
             return "Invalid register/immediate combination for instruction";
         case VMERR_ARG_COMB:
             return "Impossible argument combination";
+        case VMERR_INVALID_OOB_IP:
+            return "Instruction pointer out of bounds";
+        case VMERR_INVALID_MEM:
+            return "Invalid memory access";
     }
 
     return "Why are you here ?";
@@ -115,7 +119,7 @@ void vm_stacktrace(vm_state *st)
     printf("============ Stacktrace ============\n");
 
     for(i = 0;i < 15; i++) {
-        if(cnt < st->binary_size){
+        if(cnt < VM_MEMORY){
             off += ds_disassemble((char *)&st->memory[cnt], (char *)&asmval);
             printf("0x%08x : %s\n", cnt, asmval);
             cnt += off;
@@ -170,6 +174,10 @@ vm_error vm_execute(vm_state *st)
 	    }
 
         
+        if(st->ip < 0 || st->ip > VM_MEMORY) {
+            return VMERR_INVALID_OOB_IP; 
+        }
+
         op = MEM_GET_U8(&st->memory[st->ip++]);
 
         if(op > OP_MAX_INDEX)
@@ -193,15 +201,27 @@ vm_error vm_execute(vm_state *st)
                     st->regs[arg0] = arg1;
                     break;
                 case OP_LDR:
+                    if(arg1 > VM_MEMORY)
+                        return VMERR_INVALID_MEM;
+
                     st->regs[arg0] = MEM_GET_U32(&st->memory[arg1]);
                     break;
                 case OP_LDRB:
+                    if(arg1 > VM_MEMORY)
+                        return VMERR_INVALID_MEM;
+
                     st->regs[arg0] = MEM_GET_U8(&st->memory[arg1]);
                     break;
                 case OP_STR:
+                    if(arg1 > VM_MEMORY)
+                        return VMERR_INVALID_MEM;
+
                     MEM_SET_U32(&st->memory[arg1], st->regs[arg0]);
                     break;
                 case OP_STRB:
+                    if(arg1 > VM_MEMORY)
+                        return VMERR_INVALID_MEM;
+                    
                     MEM_SET_U8(&st->memory[arg1], st->regs[arg0]);
                     break;
                 case OP_ADD:
