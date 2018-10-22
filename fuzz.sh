@@ -2,7 +2,7 @@
 
 CRASHING=0
 RUNS=0
-SEED_FILE=samples/crackme.mx
+SEED_FILE=samples/conditional.mx
 
 # We clean the workspace
 rm -rf fuzz
@@ -13,7 +13,7 @@ while true;do
     TEST_FILE=fuzz/case_$id.mx
     cp $SEED_FILE $TEST_FILE
     cat $TEST_FILE | radamsa > $TEST_FILE
-    res=$(timeout -s INT 1 ./min-vm --run $TEST_FILE > /dev/null 2>&1)
+    timeout -s INT 1 ./min-vm --run $TEST_FILE > /dev/null 2>&1
     
     if [ $? = "139" ]
     then
