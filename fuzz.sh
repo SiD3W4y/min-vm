@@ -2,7 +2,7 @@
 
 CRASHING=0
 RUNS=0
-SEED_FILE=samples/conditional.mx
+SEED_FILE=mandelbrot.min.mx
 
 # We clean the workspace
 rm -rf fuzz

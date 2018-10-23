@@ -289,15 +289,27 @@ vm_error vm_execute(vm_state *st)
                     st->regs[arg0] = st->regs[arg1];
                     break;
                 case OP_LDR:
+                    if(st->regs[arg1] > VM_MEMORY)
+                        return VMERR_INVALID_MEM;
+                    
                     st->regs[arg0] = MEM_GET_U32(&st->memory[st->regs[arg1]]);
                     break;
                 case OP_LDRB:
+                    if(st->regs[arg1] > VM_MEMORY)
+                        return VMERR_INVALID_MEM;
+                    
                     st->regs[arg0] = MEM_GET_U8(&st->memory[st->regs[arg1]]);
                     break;
                 case OP_STR:
+                    if(st->regs[arg1] > VM_MEMORY)
+                        return VMERR_INVALID_MEM;        
+
                     MEM_SET_U32(&st->memory[st->regs[arg1]], st->regs[arg0]);
                     break;
                 case OP_STRB:
+                    if(st->regs[arg1] > VM_MEMORY)
+                        return VMERR_INVALID_MEM;
+                    
                     MEM_SET_U8(&st->memory[st->regs[arg1]], st->regs[arg0]);
                     break;
                 case OP_ADD:
@@ -348,13 +360,24 @@ vm_error vm_execute(vm_state *st)
                     break;
                 case OP_PUSH:
                     st->regs[REG_SP] -= 4;
+            
+                    if(st->regs[REG_SP] < 0)
+                        return VMERR_INVALID_MEM;
+                    
                     MEM_SET_U32(&st->memory[st->regs[REG_SP]], st->regs[arg0]);
                     break;
                 case OP_POP:
                     st->regs[arg0] = MEM_GET_U32(&st->memory[st->regs[REG_SP]]);
                     st->regs[REG_SP] += 4;
+
+                    if(st->regs[REG_SP] > VM_MEMORY)
+                        return VMERR_INVALID_MEM;
+                    
                     break;
                 case OP_RET:
+                    if(st->regs[REG_SP] > VM_MEMORY)
+                        return VMERR_INVALID_MEM;
+                    
                     st->ip = MEM_GET_U32(&st->memory[st->regs[REG_SP]]);
                     st->regs[REG_SP] += 4;
                     break;
