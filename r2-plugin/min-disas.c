@@ -5,8 +5,10 @@
 
 static int disassemble(RAsm *a,RAsmOp *op,const ut8 *b,int l)
 {
-    op->size = ds_disassemble(b,op->buf_asm);
-    
+    char buff[256];
+    op->size = ds_disassemble(b, buff);
+    r_strbuf_set(&op->buf_asm, buff);
+
     return op->size;
 }
 
